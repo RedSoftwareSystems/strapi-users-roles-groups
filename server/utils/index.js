@@ -1,6 +1,6 @@
 "use strict";
 
-import sanitize from "./sanitize";
+const sanitize = require("./sanitize");
 
 /**
  * Returns the plugin service with the given name
@@ -12,7 +12,7 @@ const getService = (name) => {
   return strapi.plugin("users-permissions").service(name);
 };
 
-export default {
+module.exports = {
   getService,
   sanitize,
 };

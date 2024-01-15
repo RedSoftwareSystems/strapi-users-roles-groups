@@ -1,13 +1,13 @@
 "use strict";
 
-import register from "./register";
-import bootstrap from "./bootstrap";
-import contentTypes from "./content-types";
-import middlewares from "./middlewares";
-import services from "./services";
-import routes from "./routes";
-import controllers from "./controllers";
-import config from "./config";
+const register = require("./register");
+const bootstrap = require("./bootstrap");
+const contentTypes = require("./content-types");
+const middlewares = require("./middlewares");
+const services = require("./services");
+const routes = require("./routes");
+const controllers = require("./controllers");
+const config = require("./config");
 
 /**
  * Cb that returns the Server API
@@ -25,4 +25,4 @@ const cb = () => ({
   services,
 });
 
-export default cb;
+module.exports = cb;

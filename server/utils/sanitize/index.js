@@ -1,6 +1,6 @@
 "use strict";
 
-import visitors from "./visitors";
-import sanitizers from "./sanitizers";
+const visitors = require("./visitors");
+const sanitizers = require("./sanitizers");
 
-export { visitors, sanitizers };
+module.exports = { visitors, sanitizers };

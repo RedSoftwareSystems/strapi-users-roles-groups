@@ -208,4 +208,4 @@ For security reasons, prefer storing the secret in an environment variable and r
   }
 };
 
-export default bootstrapCb;
+module.exports = bootstrapCb;

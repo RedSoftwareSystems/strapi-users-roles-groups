@@ -2,10 +2,10 @@
 
 const { castArray, map, every, pipe } = require("lodash/fp");
 
-import strapiUtils from "@strapi/utils";
+const strapiUtils = require("@strapi/utils");
 const { ForbiddenError, UnauthorizedError } = strapiUtils.errors;
 
-import { getService } from "../utils";
+const { getService } = require("../utils");
 
 const getAdvancedSettings = () => {
   return strapi
@@ -114,7 +114,7 @@ const verify = async (auth, config) => {
   }
 };
 
-export default {
+module.exports = {
   name: "users-permissions",
   authenticate,
   verify,

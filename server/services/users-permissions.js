@@ -288,4 +288,4 @@ const usersPermissions = ({ strapi }) => ({
     }
   },
 });
-export default usersPermissions;
+module.exports = usersPermissions;
