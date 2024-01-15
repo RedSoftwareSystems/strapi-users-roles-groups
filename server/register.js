@@ -1,9 +1,9 @@
 "use strict";
-import fs from "fs/promises";
-import path from "path";
+const fs = require("fs/promises");
+const path = require("path");
 
-import authStrategy from "./strategies/users-permissions";
-import sanitizers from "./utils/sanitize/sanitizers";
+const authStrategy = require("./strategies/users-permissions");
+const sanitizers = require("./utils/sanitize/sanitizers");
 
 /**
  * Strapi register callback
@@ -17,7 +17,7 @@ const register = ({ strapi }) => {
   strapi.sanitizers.add("content-api.output", sanitizers.defaultSanitizeOutput);
 
   if (strapi.plugin("graphql")) {
-    import("./graphql").then((graphql) => graphql({ strapi }));
+    require("./graphql")({ strapi });
   }
 
   if (strapi.plugin("documentation")) {
@@ -34,4 +34,4 @@ const register = ({ strapi }) => {
   }
 };
 
-export default register;
+module.exports = register;

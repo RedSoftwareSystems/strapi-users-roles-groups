@@ -1,4 +1,4 @@
-export const curry =
+module.exports =
   (fn) =>
   (...args) =>
     fn.bind(null, ...args);

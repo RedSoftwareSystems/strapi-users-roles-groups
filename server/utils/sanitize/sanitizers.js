@@ -1,14 +1,19 @@
 "use strict";
 
-import { curry } from "../fp";
-import { traverseEntity, pipeAsync } from "@strapi/utils";
+const { curry } = require("../fp");
+const { traverseEntity, pipeAsync } = require("@strapi/utils");
 
-import { removeUserRelationFromRoleEntities } from "./visitors";
+const { removeUserRelationFromRoleEntities } = require("./visitors");
 
-export const sanitizeUserRelationFromRoleEntities = curry((schema, entity) => {
+const sanitizeUserRelationFromRoleEntities = curry((schema, entity) => {
   return traverseEntity(removeUserRelationFromRoleEntities, { schema }, entity);
 });
 
-export const defaultSanitizeOutput = curry((schema, entity) => {
+const defaultSanitizeOutput = curry((schema, entity) => {
   return pipeAsync(sanitizeUserRelationFromRoleEntities(schema))(entity);
 });
+
+module.exports = {
+  sanitizeUserRelationFromRoleEntities,
+  defaultSanitizeOutput,
+};

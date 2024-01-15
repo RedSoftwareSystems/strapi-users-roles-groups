@@ -1,7 +1,7 @@
 "use strict";
 
-import removeUserRelationFromRoleEntities from "./remove-user-relation-from-role-entities";
+const removeUserRelationFromRoleEntities = require("./remove-user-relation-from-role-entities");
 
-export default {
+module.exports = {
   removeUserRelationFromRoleEntities,
 };

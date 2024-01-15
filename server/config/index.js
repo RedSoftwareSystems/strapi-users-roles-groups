@@ -31,4 +31,4 @@ const config = {
   validator() {},
 };
 
-export default config;
+module.exports = config;

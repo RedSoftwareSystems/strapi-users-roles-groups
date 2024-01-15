@@ -179,4 +179,4 @@ const grantConfig = (baseURL) => ({
   },
 });
 
-export default grantConfig;
+module.exports = grantConfig;
