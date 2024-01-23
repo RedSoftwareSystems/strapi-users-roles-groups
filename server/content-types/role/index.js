@@ -1,50 +1,52 @@
-'use strict';
+"use strict";
+
+const pluginId = require("../../pluginId");
 
 module.exports = {
-  collectionName: 'up_roles',
+  collectionName: "eup_roles",
   info: {
-    name: 'role',
-    description: '',
-    singularName: 'role',
-    pluralName: 'roles',
-    displayName: 'Role',
+    name: "role",
+    description: "",
+    singularName: "role",
+    pluralName: "roles",
+    displayName: "Role",
   },
   pluginOptions: {
-    'content-manager': {
+    "content-manager": {
       visible: false,
     },
-    'content-type-builder': {
+    "content-type-builder": {
       visible: false,
     },
   },
   attributes: {
     name: {
-      type: 'string',
+      type: "string",
       minLength: 3,
       required: true,
       configurable: false,
     },
     description: {
-      type: 'string',
+      type: "string",
       configurable: false,
     },
     type: {
-      type: 'string',
+      type: "string",
       unique: true,
       configurable: false,
     },
     permissions: {
-      type: 'relation',
-      relation: 'oneToMany',
-      target: 'plugin::users-permissions.permission',
-      mappedBy: 'role',
+      type: "relation",
+      relation: "oneToMany",
+      target: `plugin::${pluginId}.permission`,
+      mappedBy: "role",
       configurable: false,
     },
     users: {
-      type: 'relation',
-      relation: 'oneToMany',
-      target: 'plugin::users-permissions.user',
-      mappedBy: 'role',
+      type: "relation",
+      relation: "manyToMany",
+      target: `plugin::${pluginId}.user`,
+      mappedBy: "roles",
       configurable: false,
     },
   },

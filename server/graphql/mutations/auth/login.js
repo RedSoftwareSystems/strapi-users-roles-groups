@@ -1,17 +1,18 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
 
-const { checkBadRequest } = require('../../utils');
+const { checkBadRequest } = require("../../utils");
+const pluginId = require("../../../pluginId");
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
 
   return {
-    type: nonNull('UsersPermissionsLoginPayload'),
+    type: nonNull("UsersPermissionsLoginPayload"),
 
     args: {
-      input: nonNull('UsersPermissionsLoginInput'),
+      input: nonNull("UsersPermissionsLoginInput"),
     },
 
     async resolve(parent, args, context) {
@@ -20,7 +21,7 @@ module.exports = ({ nexus, strapi }) => {
       koaContext.params = { provider: args.input.provider };
       koaContext.request.body = toPlainObject(args.input);
 
-      await strapi.plugin('users-permissions').controller('auth').callback(koaContext);
+      await strapi.plugin(pluginId).controller("auth").callback(koaContext);
 
       const output = koaContext.body;
 

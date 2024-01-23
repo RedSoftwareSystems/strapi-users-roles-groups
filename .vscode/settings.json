@@ -1,0 +1,5 @@
+{
+  "previewjsdoc.confFile": "jsdoc.conf.json",
+  "previewjsdoc.jsdocBin": "./node_modules/.bin/jsdoc",
+  "workbench.colorTheme": "Quiet Light"
+}

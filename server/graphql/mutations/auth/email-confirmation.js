@@ -1,20 +1,21 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
 
-const { checkBadRequest } = require('../../utils');
+const { checkBadRequest } = require("../../utils");
+const pluginId = require("../../../pluginId");
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
 
   return {
-    type: 'UsersPermissionsLoginPayload',
+    type: "UsersPermissionsLoginPayload",
 
     args: {
-      confirmation: nonNull('String'),
+      confirmation: nonNull("String"),
     },
 
-    description: 'Confirm an email users email address',
+    description: "Confirm an email users email address",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
@@ -22,8 +23,8 @@ module.exports = ({ nexus, strapi }) => {
       koaContext.query = toPlainObject(args);
 
       await strapi
-        .plugin('users-permissions')
-        .controller('auth')
+        .plugin(pluginId)
+        .controller("auth")
         .emailConfirmation(koaContext, null, true);
 
       const output = koaContext.body;

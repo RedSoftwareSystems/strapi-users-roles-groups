@@ -1,29 +1,36 @@
+import pluginName from "./pluginId";
 export const PERMISSIONS = {
   // Roles
   accessRoles: [
-    { action: 'plugin::users-permissions.roles.create', subject: null },
-    { action: 'plugin::users-permissions.roles.read', subject: null },
+    { action: `plugin::${pluginName}.roles.create`, subject: null },
+    { action: `plugin::${pluginName}.roles.read`, subject: null },
   ],
-  createRole: [{ action: 'plugin::users-permissions.roles.create', subject: null }],
-  deleteRole: [{ action: 'plugin::users-permissions.roles.delete', subject: null }],
-  readRoles: [{ action: 'plugin::users-permissions.roles.read', subject: null }],
-  updateRole: [{ action: 'plugin::users-permissions.roles.update', subject: null }],
+  createRole: [{ action: `plugin::${pluginName}.roles.create`, subject: null }],
+  deleteRole: [{ action: `plugin::${pluginName}.roles.delete`, subject: null }],
+  readRoles: [{ action: `plugin::${pluginName}.roles.read`, subject: null }],
+  updateRole: [{ action: `plugin::${pluginName}.roles.update`, subject: null }],
 
   // AdvancedSettings
   readAdvancedSettings: [
-    { action: 'plugin::users-permissions.advanced-settings.read', subject: null },
+    { action: `plugin::${pluginName}.advanced-settings.read`, subject: null },
   ],
   updateAdvancedSettings: [
-    { action: 'plugin::users-permissions.advanced-settings.update', subject: null },
+    { action: `plugin::${pluginName}.advanced-settings.update`, subject: null },
   ],
 
   // Emails
-  readEmailTemplates: [{ action: 'plugin::users-permissions.email-templates.read', subject: null }],
+  readEmailTemplates: [
+    { action: `plugin::${pluginName}.email-templates.read`, subject: null },
+  ],
   updateEmailTemplates: [
-    { action: 'plugin::users-permissions.email-templates.update', subject: null },
+    { action: `plugin::${pluginName}.email-templates.update`, subject: null },
   ],
 
   // Providers
-  readProviders: [{ action: 'plugin::users-permissions.providers.read', subject: null }],
-  updateProviders: [{ action: 'plugin::users-permissions.providers.update', subject: null }],
+  readProviders: [
+    { action: `plugin::${pluginName}.providers.read`, subject: null },
+  ],
+  updateProviders: [
+    { action: `plugin::${pluginName}.providers.update`, subject: null },
+  ],
 };

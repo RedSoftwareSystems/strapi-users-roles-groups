@@ -1,10 +1,12 @@
-'use strict';
+"use strict";
 
-const userUID = 'plugin::users-permissions.user';
-const roleUID = 'plugin::users-permissions.role';
+const pluginId = require("../pluginId");
+
+const userUID = `plugin::${pluginId}.user`;
+const roleUID = `plugin::${pluginId}.role`;
 
 module.exports = ({ strapi }) => {
-  const { naming } = strapi.plugin('graphql').service('utils');
+  const { naming } = strapi.plugin("graphql").service("utils");
 
   const user = strapi.getModel(userUID);
   const role = strapi.getModel(roleUID);
@@ -18,14 +20,14 @@ module.exports = ({ strapi }) => {
 
   return {
     // Disabled auth for some operations
-    'Mutation.login': { auth: false },
-    'Mutation.register': { auth: false },
-    'Mutation.forgotPassword': { auth: false },
-    'Mutation.resetPassword': { auth: false },
-    'Mutation.emailConfirmation': { auth: false },
-    'Mutation.changePassword': {
+    "Mutation.login": { auth: false },
+    "Mutation.register": { auth: false },
+    "Mutation.forgotPassword": { auth: false },
+    "Mutation.resetPassword": { auth: false },
+    "Mutation.emailConfirmation": { auth: false },
+    "Mutation.changePassword": {
       auth: {
-        scope: 'plugin::users-permissions.auth.changePassword',
+        scope: `plugin::${pluginId}.auth.changePassword`,
       },
     },
 

@@ -1,14 +1,18 @@
 "use strict";
 
 /**
+ * @typedef {Object} PluginConfig
+ */
+
+/**
  * Default plugin config
  */
 const config = {
   /**
    * Cb for default settigns
    * @param {Object} ctx - The callback context
-   * @param {(name: string)=> string?} ctx.env - The environment variables
-   * @returns
+   * @param {function} ctx.env - The environment variables
+   * @returns {PluginConfig}
    */
   default: ({ env }) => ({
     jwtSecret: env("JWT_SECRET") || "",

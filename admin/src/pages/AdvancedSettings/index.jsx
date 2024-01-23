@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   Box,
@@ -11,9 +11,11 @@ import {
   Main,
   Option,
   Select,
+  MultiSelect,
+  MultiSelectOption,
   Typography,
   useNotifyAT,
-} from '@strapi/design-system';
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   Form,
@@ -26,17 +28,18 @@ import {
   useNotification,
   useOverlayBlocker,
   useRBAC,
-} from '@strapi/helper-plugin';
-import { Check } from '@strapi/icons';
-import { Formik } from 'formik';
-import { useIntl } from 'react-intl';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+} from "@strapi/helper-plugin";
+import { Check } from "@strapi/icons";
+import { Formik } from "formik";
+import { useIntl } from "react-intl";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import { PERMISSIONS } from '../../constants';
-import { getTrad } from '../../utils';
+import { PERMISSIONS } from "../../constants";
+import { getTrad } from "../../utils";
+import pluginId from "../../pluginId";
 
-import layout from './utils/layout';
-import schema from './utils/schema';
+import layout from "./utils/layout";
+import schema from "./utils/schema";
 
 const ProtectedAdvancedSettingsPage = () => (
   <CheckPagePermissions permissions={PERMISSIONS.readAdvancedSettings}>
@@ -61,9 +64,9 @@ const AdvancedSettingsPage = () => {
   } = useRBAC({ update: PERMISSIONS.updateAdvancedSettings });
 
   const { isLoading: isLoadingData, data } = useQuery(
-    ['users-permissions', 'advanced'],
+    [pluginId, "advanced"],
     async () => {
-      const { data } = await get('/users-permissions/advanced');
+      const { data } = await get(`/${pluginId}/advanced`);
 
       return data;
     },
@@ -71,15 +74,18 @@ const AdvancedSettingsPage = () => {
       onSuccess() {
         notifyStatus(
           formatMessage({
-            id: getTrad('Form.advancedSettings.data.loaded'),
-            defaultMessage: 'Advanced settings data has been loaded',
+            id: getTrad("Form.advancedSettings.data.loaded"),
+            defaultMessage: "Advanced settings data has been loaded",
           })
         );
       },
       onError() {
         toggleNotification({
-          type: 'warning',
-          message: { id: getTrad('notification.error'), defaultMessage: 'An error occured' },
+          type: "warning",
+          message: {
+            id: getTrad("notification.error"),
+            defaultMessage: "An error occured",
+          },
         });
       },
     }
@@ -87,27 +93,33 @@ const AdvancedSettingsPage = () => {
 
   const isLoading = isLoadingForPermissions || isLoadingData;
 
-  const submitMutation = useMutation((body) => put('/users-permissions/advanced', body), {
-    async onSuccess() {
-      await queryClient.invalidateQueries(['users-permissions', 'advanced']);
+  const submitMutation = useMutation(
+    (body) => put(`/${pluginId}/advanced`, body),
+    {
+      async onSuccess() {
+        await queryClient.invalidateQueries([pluginId, "advanced"]);
 
-      toggleNotification({
-        type: 'success',
-        message: { id: getTrad('notification.success.saved'), defaultMessage: 'Saved' },
-      });
+        toggleNotification({
+          type: "success",
+          message: {
+            id: getTrad("notification.success.saved"),
+            defaultMessage: "Saved",
+          },
+        });
 
-      unlockApp();
-    },
-    onError(error) {
-      toggleNotification({
-        type: 'warning',
-        message: formatAPIError(error),
-      });
+        unlockApp();
+      },
+      onError(error) {
+        toggleNotification({
+          type: "warning",
+          message: formatAPIError(error),
+        });
 
-      unlockApp();
-    },
-    refetchActive: true,
-  });
+        unlockApp();
+      },
+      refetchActive: true,
+    }
+  );
 
   const { isLoading: isSubmittingForm } = submitMutation;
 
@@ -118,7 +130,7 @@ const AdvancedSettingsPage = () => {
       ...body,
       email_confirmation_redirection: body.email_confirmation
         ? body.email_confirmation_redirection
-        : '',
+        : "",
     });
   };
 
@@ -127,14 +139,14 @@ const AdvancedSettingsPage = () => {
       <Main aria-busy="true">
         <SettingsPageTitle
           name={formatMessage({
-            id: getTrad('HeaderNav.link.advancedSettings'),
-            defaultMessage: 'Advanced Settings',
+            id: getTrad("HeaderNav.link.advancedSettings"),
+            defaultMessage: "Advanced Settings",
           })}
         />
         <HeaderLayout
           title={formatMessage({
-            id: getTrad('HeaderNav.link.advancedSettings'),
-            defaultMessage: 'Advanced Settings',
+            id: getTrad("HeaderNav.link.advancedSettings"),
+            defaultMessage: "Advanced Settings",
           })}
         />
         <ContentLayout>
@@ -148,8 +160,8 @@ const AdvancedSettingsPage = () => {
     <Main aria-busy={isSubmittingForm}>
       <SettingsPageTitle
         name={formatMessage({
-          id: getTrad('HeaderNav.link.advancedSettings'),
-          defaultMessage: 'Advanced Settings',
+          id: getTrad("HeaderNav.link.advancedSettings"),
+          defaultMessage: "Advanced Settings",
         })}
       />
       <Formik
@@ -164,8 +176,8 @@ const AdvancedSettingsPage = () => {
             <Form>
               <HeaderLayout
                 title={formatMessage({
-                  id: getTrad('HeaderNav.link.advancedSettings'),
-                  defaultMessage: 'Advanced Settings',
+                  id: getTrad("HeaderNav.link.advancedSettings"),
+                  defaultMessage: "Advanced Settings",
                 })}
                 primaryAction={
                   <Button
@@ -175,7 +187,10 @@ const AdvancedSettingsPage = () => {
                     startIcon={<Check />}
                     size="S"
                   >
-                    {formatMessage({ id: 'global.save', defaultMessage: 'Save' })}
+                    {formatMessage({
+                      id: "global.save",
+                      defaultMessage: "Save",
+                    })}
                   </Button>
                 }
               />
@@ -192,25 +207,30 @@ const AdvancedSettingsPage = () => {
                   <Flex direction="column" alignItems="stretch" gap={4}>
                     <Typography variant="delta" as="h2">
                       {formatMessage({
-                        id: 'global.settings',
-                        defaultMessage: 'Settings',
+                        id: "global.settings",
+                        defaultMessage: "Settings",
                       })}
                     </Typography>
                     <Grid gap={6}>
                       <GridItem col={6} s={12}>
                         <Select
                           label={formatMessage({
-                            id: getTrad('EditForm.inputSelect.label.role'),
-                            defaultMessage: 'Default role for authenticated users',
+                            id: getTrad("EditForm.inputSelect.label.role"),
+                            defaultMessage:
+                              "Default role for authenticated users",
                           })}
                           value={values.default_role}
                           hint={formatMessage({
-                            id: getTrad('EditForm.inputSelect.description.role'),
+                            id: getTrad(
+                              "EditForm.inputSelect.description.role"
+                            ),
                             defaultMessage:
-                              'It will attach the new authenticated user to the selected role.',
+                              "It will attach the new authenticated user to the selected roles.",
                           })}
                           onChange={(e) =>
-                            handleChange({ target: { name: 'default_role', value: e } })
+                            handleChange({
+                              target: { name: "default_role", value: e },
+                            })
                           }
                         >
                           {data.roles.map((role) => {
@@ -226,7 +246,7 @@ const AdvancedSettingsPage = () => {
                         let value = values[input.name];
 
                         if (!value) {
-                          value = input.type === 'bool' ? false : '';
+                          value = input.type === "bool" ? false : "";
                         }
 
                         return (
@@ -236,7 +256,8 @@ const AdvancedSettingsPage = () => {
                               value={value}
                               error={errors[input.name]}
                               disabled={
-                                input.name === 'email_confirmation_redirection' &&
+                                input.name ===
+                                  "email_confirmation_redirection" &&
                                 values.email_confirmation === false
                               }
                               onChange={handleChange}

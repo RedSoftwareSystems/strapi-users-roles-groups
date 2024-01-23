@@ -16,22 +16,22 @@ const register = ({ strapi }) => {
   strapi.container.get("auth").register("content-api", authStrategy);
   strapi.sanitizers.add("content-api.output", sanitizers.defaultSanitizeOutput);
 
-  if (strapi.plugin("graphql")) {
-    require("./graphql")({ strapi });
-  }
+  // if (strapi.plugin("graphql")) {
+  //   require("./graphql")({ strapi });
+  // }
 
-  if (strapi.plugin("documentation")) {
-    const specPath = path.join(__dirname, "../documentation/content-api.yaml");
-    const spec = fs.readFileSync(specPath, "utf8");
+  // if (strapi.plugin("documentation")) {
+  //   const specPath = path.join(__dirname, "../documentation/content-api.yaml");
+  //   const spec = fs.readFileSync(specPath, "utf8");
 
-    strapi
-      .plugin("documentation")
-      .service("override")
-      .registerOverride(spec, {
-        pluginOrigin: "users-permissions",
-        excludeFromGeneration: ["users-permissions"],
-      });
-  }
+  //   strapi
+  //     .plugin("documentation")
+  //     .service("override")
+  //     .registerOverride(spec, {
+  //       pluginOrigin: "users-permissions",
+  //       excludeFromGeneration: ["users-permissions"],
+  //     });
+  // }
 };
 
 module.exports = register;

@@ -1,12 +1,26 @@
-import React from 'react';
+import React from "react";
 
-import { Flex, IconButton, Link, Tbody, Td, Tr, Typography } from '@strapi/design-system';
-import { CheckPermissions, onRowClick, pxToRem, stopPropagation } from '@strapi/helper-plugin';
-import { Pencil, Trash } from '@strapi/icons';
-import PropTypes from 'prop-types';
-import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
-import styled from 'styled-components';
+import {
+  Flex,
+  IconButton,
+  Link,
+  Tbody,
+  Td,
+  Tr,
+  Typography,
+} from "@strapi/design-system";
+import {
+  CheckPermissions,
+  onRowClick,
+  pxToRem,
+  stopPropagation,
+} from "@strapi/helper-plugin";
+import { Pencil, Trash } from "@strapi/icons";
+import PropTypes from "prop-types";
+import { useIntl } from "react-intl";
+import { useHistory } from "react-router-dom";
+import styled from "styled-components";
+import pluginId from "../../../../../pluginId";
 
 const EditLink = styled(Link)`
   align-items: center;
@@ -35,13 +49,19 @@ const EditLink = styled(Link)`
   }
 `;
 
-const TableBody = ({ sortedRoles, canDelete, permissions, setRoleToDelete, onDelete }) => {
+const TableBody = ({
+  sortedRoles,
+  canDelete,
+  permissions,
+  setRoleToDelete,
+  onDelete,
+}) => {
   const { formatMessage } = useIntl();
   const { push } = useHistory();
   const [showConfirmDelete, setShowConfirmDelete] = onDelete;
 
   const checkCanDeleteRole = (role) =>
-    canDelete && !['public', 'authenticated'].includes(role.type);
+    canDelete && !["public", "authenticated"].includes(role.type);
 
   const handleClickDelete = (id) => {
     setRoleToDelete(id);
@@ -49,13 +69,16 @@ const TableBody = ({ sortedRoles, canDelete, permissions, setRoleToDelete, onDel
   };
 
   const handleClickEdit = (id) => {
-    push(`/settings/users-permissions/roles/${id}`);
+    push(`/settings/${pluginId}/roles/${id}`);
   };
 
   return (
     <Tbody>
       {sortedRoles?.map((role) => (
-        <Tr key={role.name} {...onRowClick({ fn: () => handleClickEdit(role.id) })}>
+        <Tr
+          key={role.name}
+          {...onRowClick({ fn: () => handleClickEdit(role.id) })}
+        >
           <Td width="20%">
             <Typography>{role.name}</Typography>
           </Td>
@@ -66,8 +89,9 @@ const TableBody = ({ sortedRoles, canDelete, permissions, setRoleToDelete, onDel
             <Typography>
               {formatMessage(
                 {
-                  id: 'Roles.RoleRow.user-count',
-                  defaultMessage: '{number, plural, =0 {# user} one {# user} other {# users}}',
+                  id: "Roles.RoleRow.user-count",
+                  defaultMessage:
+                    "{number, plural, =0 {# user} one {# user} other {# users}}",
                 },
                 { number: role.nb_users }
               )}
@@ -77,9 +101,12 @@ const TableBody = ({ sortedRoles, canDelete, permissions, setRoleToDelete, onDel
             <Flex justifyContent="end" {...stopPropagation}>
               <CheckPermissions permissions={permissions.updateRole}>
                 <EditLink
-                  to={`/settings/users-permissions/roles/${role.id}`}
+                  to={`/settings/${pluginId}/roles/${role.id}`}
                   aria-label={formatMessage(
-                    { id: 'app.component.table.edit', defaultMessage: 'Edit {target}' },
+                    {
+                      id: "app.component.table.edit",
+                      defaultMessage: "Edit {target}",
+                    },
                     { target: `${role.name}` }
                   )}
                 >
@@ -94,7 +121,10 @@ const TableBody = ({ sortedRoles, canDelete, permissions, setRoleToDelete, onDel
                     noBorder
                     icon={<Trash />}
                     label={formatMessage(
-                      { id: 'global.delete-target', defaultMessage: 'Delete {target}' },
+                      {
+                        id: "global.delete-target",
+                        defaultMessage: "Delete {target}",
+                      },
                       { target: `${role.name}` }
                     )}
                   />

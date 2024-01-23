@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 import {
   ActionLayout,
@@ -13,7 +13,7 @@ import {
   Typography,
   useNotifyAT,
   VisuallyHidden,
-} from '@strapi/design-system';
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   CheckPermissions,
@@ -31,16 +31,17 @@ import {
   useQueryParams,
   useRBAC,
   useTracking,
-} from '@strapi/helper-plugin';
-import { Plus } from '@strapi/icons';
-import { useIntl } from 'react-intl';
-import { useMutation, useQuery } from 'react-query';
+} from "@strapi/helper-plugin";
+import { Plus } from "@strapi/icons";
+import { useIntl } from "react-intl";
+import { useMutation, useQuery } from "react-query";
 
-import { PERMISSIONS } from '../../../../constants';
-import { getTrad } from '../../../../utils';
+import { PERMISSIONS } from "../../../../constants";
+import { getTrad } from "../../../../utils";
+import pluginId from "../../../../pluginId";
 
-import TableBody from './components/TableBody';
-import { deleteData, fetchData } from './utils/api';
+import TableBody from "./components/TableBody";
+import { deleteData, fetchData } from "./utils/api";
 
 export const RolesListPage = () => {
   const { trackUsage } = useTracking();
@@ -48,7 +49,7 @@ export const RolesListPage = () => {
   const toggleNotification = useNotification();
   const { notifyStatus } = useNotifyAT();
   const [{ query }] = useQueryParams();
-  const _q = query?._q || '';
+  const _q = query?._q || "";
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isConfirmButtonLoading, setIsConfirmButtonLoading] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState();
@@ -69,20 +70,20 @@ export const RolesListPage = () => {
     data: { roles },
     isFetching,
     refetch,
-  } = useQuery('get-roles', () => fetchData(toggleNotification, notifyStatus), {
+  } = useQuery("get-roles", () => fetchData(toggleNotification, notifyStatus), {
     initialData: {},
     enabled: canRead,
   });
 
   const { includes } = useFilter(locale, {
-    sensitivity: 'base',
+    sensitivity: "base",
   });
 
   /**
    * @type {Intl.Collator}
    */
   const formatter = useCollator(locale, {
-    sensitivity: 'base',
+    sensitivity: "base",
   });
 
   const isLoading = isLoadingForData || isFetching;
@@ -93,25 +94,28 @@ export const RolesListPage = () => {
 
   const emptyLayout = {
     roles: {
-      id: getTrad('Roles.empty'),
+      id: getTrad("Roles.empty"),
       defaultMessage: "You don't have any roles yet.",
     },
     search: {
-      id: getTrad('Roles.empty.search'),
-      defaultMessage: 'No roles match the search.',
+      id: getTrad("Roles.empty.search"),
+      defaultMessage: "No roles match the search.",
     },
   };
 
   const pageTitle = formatMessage({
-    id: 'global.roles',
-    defaultMessage: 'Roles',
+    id: "global.roles",
+    defaultMessage: "Roles",
   });
 
-  const deleteMutation = useMutation((id) => deleteData(id, toggleNotification), {
-    async onSuccess() {
-      await refetch();
-    },
-  });
+  const deleteMutation = useMutation(
+    (id) => deleteData(id, toggleNotification),
+    {
+      async onSuccess() {
+        await refetch();
+      },
+    }
+  );
 
   const handleConfirmDelete = async () => {
     setIsConfirmButtonLoading(true);
@@ -123,10 +127,12 @@ export const RolesListPage = () => {
   const sortedRoles = (roles || [])
     .filter((role) => includes(role.name, _q) || includes(role.description, _q))
     .sort(
-      (a, b) => formatter.compare(a.name, b.name) || formatter.compare(a.description, b.description)
+      (a, b) =>
+        formatter.compare(a.name, b.name) ||
+        formatter.compare(a.description, b.description)
     );
 
-  const emptyContent = _q && !sortedRoles.length ? 'search' : 'roles';
+  const emptyContent = _q && !sortedRoles.length ? "search" : "roles";
 
   const colCount = 4;
   const rowCount = (roles?.length || 0) + 1;
@@ -137,24 +143,24 @@ export const RolesListPage = () => {
       <Main aria-busy={isLoading}>
         <HeaderLayout
           title={formatMessage({
-            id: 'global.roles',
-            defaultMessage: 'Roles',
+            id: "global.roles",
+            defaultMessage: "Roles",
           })}
           subtitle={formatMessage({
-            id: 'Settings.roles.list.description',
-            defaultMessage: 'List of roles',
+            id: "Settings.roles.list.description",
+            defaultMessage: "List of roles",
           })}
           primaryAction={
             <CheckPermissions permissions={PERMISSIONS.createRole}>
               <LinkButton
-                to="/settings/users-permissions/roles/new"
-                onClick={() => trackUsage('willCreateRole')}
+                to={`/settings/${pluginId}/roles/new`}
+                onClick={() => trackUsage("willCreateRole")}
                 startIcon={<Plus />}
                 size="S"
               >
                 {formatMessage({
-                  id: getTrad('List.button.roles'),
-                  defaultMessage: 'Add new role',
+                  id: getTrad("List.button.roles"),
+                  defaultMessage: "Add new role",
                 })}
               </LinkButton>
             </CheckPermissions>
@@ -165,8 +171,8 @@ export const RolesListPage = () => {
           startActions={
             <SearchURLQuery
               label={formatMessage({
-                id: 'app.component.search.label',
-                defaultMessage: 'Search',
+                id: "app.component.search.label",
+                defaultMessage: "Search",
               })}
             />
           }
@@ -181,30 +187,33 @@ export const RolesListPage = () => {
                 <Tr>
                   <Th>
                     <Typography variant="sigma" textColor="neutral600">
-                      {formatMessage({ id: 'global.name', defaultMessage: 'Name' })}
-                    </Typography>
-                  </Th>
-                  <Th>
-                    <Typography variant="sigma" textColor="neutral600">
                       {formatMessage({
-                        id: 'global.description',
-                        defaultMessage: 'Description',
+                        id: "global.name",
+                        defaultMessage: "Name",
                       })}
                     </Typography>
                   </Th>
                   <Th>
                     <Typography variant="sigma" textColor="neutral600">
                       {formatMessage({
-                        id: 'global.users',
-                        defaultMessage: 'Users',
+                        id: "global.description",
+                        defaultMessage: "Description",
+                      })}
+                    </Typography>
+                  </Th>
+                  <Th>
+                    <Typography variant="sigma" textColor="neutral600">
+                      {formatMessage({
+                        id: "global.users",
+                        defaultMessage: "Users",
                       })}
                     </Typography>
                   </Th>
                   <Th>
                     <VisuallyHidden>
                       {formatMessage({
-                        id: 'global.actions',
-                        defaultMessage: 'Actions',
+                        id: "global.actions",
+                        defaultMessage: "Actions",
                       })}
                     </VisuallyHidden>
                   </Th>

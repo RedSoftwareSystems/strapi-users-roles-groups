@@ -1,9 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useNotification, useFetchClient, useAPIErrorHandler } from '@strapi/helper-plugin';
-import { useQueries } from 'react-query';
+import {
+  useNotification,
+  useFetchClient,
+  useAPIErrorHandler,
+} from "@strapi/helper-plugin";
+import { useQueries } from "react-query";
 
-import { cleanPermissions, getTrad } from '../../../utils';
+import { cleanPermissions, getTrad } from "../../../utils";
+import pluginId from "../../../pluginId";
 
 export const usePlugins = () => {
   const toggleNotification = useNotification();
@@ -17,24 +22,29 @@ export const usePlugins = () => {
       error: permissionsError,
       refetch: refetchPermissions,
     },
-    { data: routes, isLoading: isLoadingRoutes, error: routesError, refetch: refetchRoutes },
+    {
+      data: routes,
+      isLoading: isLoadingRoutes,
+      error: routesError,
+      refetch: refetchRoutes,
+    },
   ] = useQueries([
     {
-      queryKey: ['users-permissions', 'permissions'],
+      queryKey: [pluginId, "permissions"],
       async queryFn() {
         const {
           data: { permissions },
-        } = await get(`/users-permissions/permissions`);
+        } = await get(`/${pluginId}/permissions`);
 
         return permissions;
       },
     },
     {
-      queryKey: ['users-permissions', 'routes'],
+      queryKey: [pluginId, "routes"],
       async queryFn() {
         const {
           data: { routes },
-        } = await get(`/users-permissions/routes`);
+        } = await get(`/${pluginId}/routes`);
 
         return routes;
       },
@@ -48,7 +58,7 @@ export const usePlugins = () => {
   useEffect(() => {
     if (permissionsError) {
       toggleNotification({
-        type: 'warning',
+        type: "warning",
         message: formatAPIError(permissionsError),
       });
     }
@@ -57,7 +67,7 @@ export const usePlugins = () => {
   useEffect(() => {
     if (routesError) {
       toggleNotification({
-        type: 'warning',
+        type: "warning",
         message: formatAPIError(routesError),
       });
     }

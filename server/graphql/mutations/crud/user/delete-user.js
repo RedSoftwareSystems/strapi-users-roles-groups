@@ -1,12 +1,15 @@
-'use strict';
+"use strict";
 
-const { checkBadRequest } = require('../../../utils');
+const pluginId = require("../../../../pluginId");
+const { checkBadRequest } = require("../../../utils");
 
-const usersPermissionsUserUID = 'plugin::users-permissions.user';
+const usersPermissionsUserUID = `plugin::${pluginId}.user`;
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
-  const { getEntityResponseName } = strapi.plugin('graphql').service('utils').naming;
+  const { getEntityResponseName } = strapi
+    .plugin("graphql")
+    .service("utils").naming;
 
   const userContentType = strapi.getModel(usersPermissionsUserUID);
 
@@ -16,23 +19,23 @@ module.exports = ({ nexus, strapi }) => {
     type: nonNull(responseName),
 
     args: {
-      id: nonNull('ID'),
+      id: nonNull("ID"),
     },
 
-    description: 'Delete an existing user',
+    description: "Delete an existing user",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
 
       koaContext.params = { id: args.id };
 
-      await strapi.plugin('users-permissions').controller('user').destroy(koaContext);
+      await strapi.plugin(pluginId).controller("user").destroy(koaContext);
 
       checkBadRequest(koaContext.body);
 
       return {
         value: koaContext.body,
-        info: { args, resourceUID: 'plugin::users-permissions.user' },
+        info: { args, resourceUID: `plugin::${pluginId}.user` },
       };
     },
   };

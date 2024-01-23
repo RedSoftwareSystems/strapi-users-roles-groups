@@ -1,11 +1,14 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
+const pluginId = require("../../../../pluginId");
 
-const usersPermissionsRoleUID = 'plugin::users-permissions.role';
+const usersPermissionsRoleUID = `plugin::${pluginId}.role`;
 
 module.exports = ({ nexus, strapi }) => {
-  const { getContentTypeInputName } = strapi.plugin('graphql').service('utils').naming;
+  const { getContentTypeInputName } = strapi
+    .plugin("graphql")
+    .service("utils").naming;
   const { nonNull } = nexus;
 
   const roleContentType = strapi.getModel(usersPermissionsRoleUID);
@@ -13,20 +16,20 @@ module.exports = ({ nexus, strapi }) => {
   const roleInputName = getContentTypeInputName(roleContentType);
 
   return {
-    type: 'UsersPermissionsCreateRolePayload',
+    type: "UsersPermissionsCreateRolePayload",
 
     args: {
       data: nonNull(roleInputName),
     },
 
-    description: 'Create a new role',
+    description: "Create a new role",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
 
       koaContext.request.body = toPlainObject(args.data);
 
-      await strapi.plugin('users-permissions').controller('role').createRole(koaContext);
+      await strapi.plugin(pluginId).controller("role").createRole(koaContext);
 
       return { ok: true };
     },

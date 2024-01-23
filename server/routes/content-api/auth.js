@@ -1,82 +1,84 @@
-'use strict';
+"use strict";
+
+const pluginId = require("../../pluginId");
 
 module.exports = [
   {
-    method: 'GET',
-    path: '/connect/(.*)',
-    handler: 'auth.connect',
+    method: "GET",
+    path: "/connect/(.*)",
+    handler: "auth.connect",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/local',
-    handler: 'auth.callback',
+    method: "POST",
+    path: "/auth/local",
+    handler: "auth.callback",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/local/register',
-    handler: 'auth.register',
+    method: "POST",
+    path: "/auth/local/register",
+    handler: "auth.register",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
   {
-    method: 'GET',
-    path: '/auth/:provider/callback',
-    handler: 'auth.callback',
+    method: "GET",
+    path: "/auth/:provider/callback",
+    handler: "auth.callback",
     config: {
-      prefix: '',
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/forgot-password',
-    handler: 'auth.forgotPassword',
+    method: "POST",
+    path: "/auth/forgot-password",
+    handler: "auth.forgotPassword",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/reset-password',
-    handler: 'auth.resetPassword',
+    method: "POST",
+    path: "/auth/reset-password",
+    handler: "auth.resetPassword",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
   {
-    method: 'GET',
-    path: '/auth/email-confirmation',
-    handler: 'auth.emailConfirmation',
+    method: "GET",
+    path: "/auth/email-confirmation",
+    handler: "auth.emailConfirmation",
     config: {
-      prefix: '',
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/send-email-confirmation',
-    handler: 'auth.sendEmailConfirmation',
+    method: "POST",
+    path: "/auth/send-email-confirmation",
+    handler: "auth.sendEmailConfirmation",
     config: {
-      prefix: '',
+      prefix: "",
     },
   },
   {
-    method: 'POST',
-    path: '/auth/change-password',
-    handler: 'auth.changePassword',
+    method: "POST",
+    path: "/auth/change-password",
+    handler: "auth.changePassword",
     config: {
-      middlewares: ['plugin::users-permissions.rateLimit'],
-      prefix: '',
+      middlewares: [`plugin::${pluginId}.rateLimit`],
+      prefix: "",
     },
   },
 ];

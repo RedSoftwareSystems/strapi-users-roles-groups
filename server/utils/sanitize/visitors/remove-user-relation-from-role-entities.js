@@ -1,11 +1,11 @@
 "use strict";
-const packageJson = require("../../../../package.json");
+const pluginName = require("../../../pluginId");
 
 module.exports = ({ schema, key, attribute }, { remove }) => {
   if (
     attribute.type === "relation" &&
-    attribute.target === `plugin::${packageJson.strapi.name}.user` &&
-    schema.uid === `plugin::${packageJson.strapi.name}.role`
+    attribute.target === `plugin::${pluginName}.user` &&
+    schema.uid === `plugin::${pluginName}.role`
   ) {
     remove(key);
   }

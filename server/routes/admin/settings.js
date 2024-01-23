@@ -1,76 +1,78 @@
-'use strict';
+"use strict";
+
+const pluginId = require("../../pluginId");
 
 module.exports = [
   {
-    method: 'GET',
-    path: '/email-templates',
-    handler: 'settings.getEmailTemplate',
+    method: "GET",
+    path: "/email-templates",
+    handler: "settings.getEmailTemplate",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.email-templates.read'],
+            actions: [`plugin::${pluginId}.email-templates.read`],
           },
         },
       ],
     },
   },
   {
-    method: 'PUT',
-    path: '/email-templates',
-    handler: 'settings.updateEmailTemplate',
+    method: "PUT",
+    path: "/email-templates",
+    handler: "settings.updateEmailTemplate",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.email-templates.update'],
+            actions: [`plugin::${pluginId}.email-templates.update`],
           },
         },
       ],
     },
   },
   {
-    method: 'GET',
-    path: '/advanced',
-    handler: 'settings.getAdvancedSettings',
+    method: "GET",
+    path: "/advanced",
+    handler: "settings.getAdvancedSettings",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.advanced-settings.read'],
+            actions: [`plugin::${pluginId}.advanced-settings.read`],
           },
         },
       ],
     },
   },
   {
-    method: 'PUT',
-    path: '/advanced',
-    handler: 'settings.updateAdvancedSettings',
+    method: "PUT",
+    path: "/advanced",
+    handler: "settings.updateAdvancedSettings",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.advanced-settings.update'],
+            actions: [`plugin::${pluginId}.advanced-settings.update`],
           },
         },
       ],
     },
   },
   {
-    method: 'GET',
-    path: '/providers',
-    handler: 'settings.getProviders',
+    method: "GET",
+    path: "/providers",
+    handler: "settings.getProviders",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.providers.read'],
+            actions: [`plugin::${pluginId}.providers.read`],
           },
         },
       ],
@@ -78,15 +80,15 @@ module.exports = [
   },
 
   {
-    method: 'PUT',
-    path: '/providers',
-    handler: 'settings.updateProviders',
+    method: "PUT",
+    path: "/providers",
+    handler: "settings.updateProviders",
     config: {
       policies: [
         {
-          name: 'admin::hasPermissions',
+          name: "admin::hasPermissions",
           config: {
-            actions: ['plugin::users-permissions.providers.update'],
+            actions: [`plugin::${pluginId}.providers.update`],
           },
         },
       ],

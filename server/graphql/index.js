@@ -1,15 +1,16 @@
-'use strict';
+"use strict";
 
-const getTypes = require('./types');
-const getQueries = require('./queries');
-const getMutations = require('./mutations');
-const getResolversConfig = require('./resolvers-configs');
+const getTypes = require("./types");
+const getQueries = require("./queries");
+const getMutations = require("./mutations");
+const getResolversConfig = require("./resolvers-configs");
+const pluginId = require("../pluginId");
 
 module.exports = ({ strapi }) => {
-  const { config: graphQLConfig } = strapi.plugin('graphql');
-  const extensionService = strapi.plugin('graphql').service('extension');
+  const { config: graphQLConfig } = strapi.plugin("graphql");
+  const extensionService = strapi.plugin("graphql").service("extension");
 
-  const isShadowCRUDEnabled = graphQLConfig('shadowCRUD', true);
+  const isShadowCRUDEnabled = graphQLConfig("shadowCRUD", true);
 
   if (!isShadowCRUDEnabled) {
     return;
@@ -18,15 +19,19 @@ module.exports = ({ strapi }) => {
   // Disable Permissions queries & mutations but allow the
   // type to be used/selected in filters or nested resolvers
   extensionService
-    .shadowCRUD('plugin::users-permissions.permission')
+    .shadowCRUD(`plugin::${pluginId}.permission`)
     .disableQueries()
     .disableMutations();
 
   // Disable User & Role's Create/Update/Delete actions so they can be replaced
-  const actionsToDisable = ['create', 'update', 'delete'];
+  const actionsToDisable = ["create", "update", "delete"];
 
-  extensionService.shadowCRUD('plugin::users-permissions.user').disableActions(actionsToDisable);
-  extensionService.shadowCRUD('plugin::users-permissions.role').disableActions(actionsToDisable);
+  extensionService
+    .shadowCRUD(`plugin::${pluginId}.user`)
+    .disableActions(actionsToDisable);
+  extensionService
+    .shadowCRUD(`plugin::${pluginId}.role`)
+    .disableActions(actionsToDisable);
 
   // Register new types & resolvers config
   extensionService.use(({ nexus }) => {

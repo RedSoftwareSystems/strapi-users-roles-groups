@@ -1,27 +1,31 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
 
-const { checkBadRequest } = require('../../utils');
+const { checkBadRequest } = require("../../utils");
+const pluginId = require("../../../pluginId");
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
 
   return {
-    type: 'UsersPermissionsPasswordPayload',
+    type: "UsersPermissionsPasswordPayload",
 
     args: {
-      email: nonNull('String'),
+      email: nonNull("String"),
     },
 
-    description: 'Request a reset password token',
+    description: "Request a reset password token",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
 
       koaContext.request.body = toPlainObject(args);
 
-      await strapi.plugin('users-permissions').controller('auth').forgotPassword(koaContext);
+      await strapi
+        .plugin(pluginId)
+        .controller("auth")
+        .forgotPassword(koaContext);
 
       const output = koaContext.body;
 

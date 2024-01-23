@@ -6,10 +6,11 @@ const strapiUtils = require("@strapi/utils");
 const { ForbiddenError, UnauthorizedError } = strapiUtils.errors;
 
 const { getService } = require("../utils");
+const pluginId = require("../pluginId");
 
 const getAdvancedSettings = () => {
   return strapi
-    .store({ type: "plugin", name: "users-permissions" })
+    .store({ type: "plugin", name: pluginId })
     .get({ key: "advanced" });
 };
 
@@ -45,9 +46,22 @@ const authenticate = async (ctx) => {
       }
 
       // Fetch user's permissions
-      const permissions = await Promise.resolve(user.role.id)
-        .then(getService("permission").findRolePermissions)
-        .then(map(getService("permission").toContentAPIPermission));
+      const servicePermission = getService("permission");
+
+      /**
+       * @type {Map<number, import("../services/users-permissions").Permission>}
+       */
+      const permissionsMap = new Map();
+      for (let role of user.roles) {
+        const permissions = await servicePermission.findRolePermissions(
+          role.id
+        );
+        permissions.forEach((p) => permissionsMap.set(p.id, p));
+      }
+
+      const permissions = permissionsMap.values.map(
+        servicePermission.toContentAPIPermission
+      );
 
       // Generate an ability (content API engine) based on the given permissions
       const ability =
@@ -115,7 +129,7 @@ const verify = async (auth, config) => {
 };
 
 module.exports = {
-  name: "users-permissions",
+  name: pluginId,
   authenticate,
   verify,
 };

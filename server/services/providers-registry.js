@@ -1,8 +1,11 @@
-'use strict';
+"use strict";
+/**
+ * @module services/providers-registry
+ */
 
-const { strict: assert } = require('assert');
-const jwt = require('jsonwebtoken');
-const jwkToPem = require('jwk-to-pem');
+const { strict: assert } = require("assert");
+const jwt = require("jsonwebtoken");
+const jwkToPem = require("jwk-to-pem");
 
 const getCognitoPayload = async ({ idToken, jwksUrl, purest }) => {
   const {
@@ -11,7 +14,7 @@ const getCognitoPayload = async ({ idToken, jwksUrl, purest }) => {
   } = jwt.decode(idToken, { complete: true });
 
   if (!payload || !kid) {
-    throw new Error('The provided token is not valid');
+    throw new Error("The provided token is not valid");
   }
 
   const config = {
@@ -23,34 +26,86 @@ const getCognitoPayload = async ({ idToken, jwksUrl, purest }) => {
     },
   };
   try {
-    const cognito = purest({ provider: 'cognito', config });
+    const cognito = purest({ provider: "cognito", config });
     // get the JSON Web Key (JWK) for the user pool
-    const { body: jwk } = await cognito('discovery').request();
+    const { body: jwk } = await cognito("discovery").request();
     // Get the key with the same Key ID as the provided token
     const key = jwk.keys.find(({ kid: jwkKid }) => jwkKid === kid);
     const pem = jwkToPem(key);
 
     // https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
     const decodedToken = await new Promise((resolve, reject) => {
-      jwt.verify(idToken, pem, { algorithms: ['RS256'] }, (err, decodedToken) => {
-        if (err) {
-          reject();
+      jwt.verify(
+        idToken,
+        pem,
+        { algorithms: ["RS256"] },
+        (err, decodedToken) => {
+          if (err) {
+            reject();
+          }
+          resolve(decodedToken);
         }
-        resolve(decodedToken);
-      });
+      );
     });
     return decodedToken;
   } catch (err) {
-    throw new Error('There was an error verifying the token');
+    throw new Error("There was an error verifying the token");
   }
 };
 
+/**
+ * @typedef {Object} UserDataCore
+ * @param {string} username
+ * @param {string} email
+ */
+
+/**
+ * @typedef {UserDataCore & Object.<string, any>} UserData
+ */
+
+/**
+ * Provider callback
+ *
+ * @callback ProviderCallback
+ * @param {object} ctx - callback context
+ * @param {string} ctx.accessToken - The access token passed by the provider
+ * @param {Object.<string, string>} ctx.query - The request parsed query
+ * @param {import("../config/grant-config").GrantProviders} ctx.providers - The request parsed query
+ * @returns {Promise<UserData>}
+ */
+
+/**
+ *
+ * @typedef {Object} InitialProviders
+ * @property {ProviderCallback} discord
+ * @property {ProviderCallback} cognito
+ * @property {ProviderCallback} facebook
+ * @property {ProviderCallback} google
+ * @property {ProviderCallback} github
+ * @property {ProviderCallback} microsoft
+ * @property {ProviderCallback} twitter
+ * @property {ProviderCallback} instagram
+ * @property {ProviderCallback} vk
+ * @property {ProviderCallback} twitch
+ * @property {ProviderCallback} linkedin
+ * @property {ProviderCallback} reddit
+ * @property {ProviderCallback} auth0
+ * @property {ProviderCallback} cas
+ * @property {ProviderCallback} patreon
+ *
+ */
+
+/**
+ * @param {Object} ctx - Context to the function
+ * @param {Object} ctx.purest - Purest instance @see https://github.com/simov/purest
+ * @returns {InitialProviders}
+ */
 const getInitialProviders = ({ purest }) => ({
   async discord({ accessToken }) {
-    const discord = purest({ provider: 'discord' });
+    const discord = purest({ provider: "discord" });
 
     return discord
-      .get('users/@me')
+      .get("users/@me")
       .auth(accessToken)
       .request()
       .then(({ body }) => {
@@ -67,17 +122,17 @@ const getInitialProviders = ({ purest }) => ({
     const idToken = query.id_token;
     const tokenPayload = await getCognitoPayload({ idToken, jwksUrl, purest });
     return {
-      username: tokenPayload['cognito:username'],
+      username: tokenPayload["cognito:username"],
       email: tokenPayload.email,
     };
   },
   async facebook({ accessToken }) {
-    const facebook = purest({ provider: 'facebook' });
+    const facebook = purest({ provider: "facebook" });
 
     return facebook
-      .get('me')
+      .get("me")
       .auth(accessToken)
-      .qs({ fields: 'name,email' })
+      .qs({ fields: "name,email" })
       .request()
       .then(({ body }) => ({
         username: body.name,
@@ -85,29 +140,32 @@ const getInitialProviders = ({ purest }) => ({
       }));
   },
   async google({ accessToken }) {
-    const google = purest({ provider: 'google' });
+    const google = purest({ provider: "google" });
 
     return google
-      .query('oauth')
-      .get('tokeninfo')
+      .query("oauth")
+      .get("tokeninfo")
       .qs({ accessToken })
       .request()
       .then(({ body }) => ({
-        username: body.email.split('@')[0],
+        username: body.email.split("@")[0],
         email: body.email,
       }));
   },
   async github({ accessToken }) {
     const github = purest({
-      provider: 'github',
+      provider: "github",
       defaults: {
         headers: {
-          'user-agent': 'strapi',
+          "user-agent": "strapi",
         },
       },
     });
 
-    const { body: userBody } = await github.get('user').auth(accessToken).request();
+    const { body: userBody } = await github
+      .get("user")
+      .auth(accessToken)
+      .request();
 
     // This is the public email on the github profile
     if (userBody.email) {
@@ -117,7 +175,10 @@ const getInitialProviders = ({ purest }) => ({
       };
     }
     // Get the email with Github's user/emails API
-    const { body: emailBody } = await github.get('user/emails').auth(accessToken).request();
+    const { body: emailBody } = await github
+      .get("user/emails")
+      .auth(accessToken)
+      .request();
 
     return {
       username: userBody.login,
@@ -127,10 +188,10 @@ const getInitialProviders = ({ purest }) => ({
     };
   },
   async microsoft({ accessToken }) {
-    const microsoft = purest({ provider: 'microsoft' });
+    const microsoft = purest({ provider: "microsoft" });
 
     return microsoft
-      .get('me')
+      .get("me")
       .auth(accessToken)
       .request()
       .then(({ body }) => ({
@@ -140,7 +201,7 @@ const getInitialProviders = ({ purest }) => ({
   },
   async twitter({ accessToken, query, providers }) {
     const twitter = purest({
-      provider: 'twitter',
+      provider: "twitter",
       defaults: {
         oauth: {
           consumer_key: providers.twitter.key,
@@ -150,9 +211,9 @@ const getInitialProviders = ({ purest }) => ({
     });
 
     return twitter
-      .get('account/verify_credentials')
+      .get("account/verify_credentials")
       .auth(accessToken, query.access_secret)
-      .qs({ screen_name: query['raw[screen_name]'], include_email: 'true' })
+      .qs({ screen_name: query["raw[screen_name]"], include_email: "true" })
       .request()
       .then(({ body }) => ({
         username: body.screen_name,
@@ -160,12 +221,12 @@ const getInitialProviders = ({ purest }) => ({
       }));
   },
   async instagram({ accessToken }) {
-    const instagram = purest({ provider: 'instagram' });
+    const instagram = purest({ provider: "instagram" });
 
     return instagram
-      .get('me')
+      .get("me")
       .auth(accessToken)
-      .qs({ fields: 'id,username' })
+      .qs({ fields: "id,username" })
       .request()
       .then(({ body }) => ({
         username: body.username,
@@ -173,12 +234,12 @@ const getInitialProviders = ({ purest }) => ({
       }));
   },
   async vk({ accessToken, query }) {
-    const vk = purest({ provider: 'vk' });
+    const vk = purest({ provider: "vk" });
 
     return vk
-      .get('users')
+      .get("users")
       .auth(accessToken)
-      .qs({ id: query.raw.user_id, v: '5.122' })
+      .qs({ id: query.raw.user_id, v: "5.122" })
       .request()
       .then(({ body }) => ({
         username: `${body.response[0].last_name} ${body.response[0].first_name}`,
@@ -187,15 +248,15 @@ const getInitialProviders = ({ purest }) => ({
   },
   async twitch({ accessToken, providers }) {
     const twitch = purest({
-      provider: 'twitch',
+      provider: "twitch",
       config: {
         twitch: {
           default: {
-            origin: 'https://api.twitch.tv',
-            path: 'helix/{path}',
+            origin: "https://api.twitch.tv",
+            path: "helix/{path}",
             headers: {
-              Authorization: 'Bearer {auth}',
-              'Client-Id': '{auth}',
+              Authorization: "Bearer {auth}",
+              "Client-Id": "{auth}",
             },
           },
         },
@@ -203,7 +264,7 @@ const getInitialProviders = ({ purest }) => ({
     });
 
     return twitch
-      .get('users')
+      .get("users")
       .auth(accessToken, providers.twitch.key)
       .request()
       .then(({ body }) => ({
@@ -212,18 +273,18 @@ const getInitialProviders = ({ purest }) => ({
       }));
   },
   async linkedin({ accessToken }) {
-    const linkedIn = purest({ provider: 'linkedin' });
+    const linkedIn = purest({ provider: "linkedin" });
     const {
       body: { localizedFirstName },
-    } = await linkedIn.get('me').auth(accessToken).request();
+    } = await linkedIn.get("me").auth(accessToken).request();
     const {
       body: { elements },
     } = await linkedIn
-      .get('emailAddress?q=members&projection=(elements*(handle~))')
+      .get("emailAddress?q=members&projection=(elements*(handle~))")
       .auth(accessToken)
       .request();
 
-    const email = elements[0]['handle~'];
+    const email = elements[0]["handle~"];
 
     return {
       username: localizedFirstName,
@@ -232,16 +293,16 @@ const getInitialProviders = ({ purest }) => ({
   },
   async reddit({ accessToken }) {
     const reddit = purest({
-      provider: 'reddit',
+      provider: "reddit",
       config: {
         reddit: {
           default: {
-            origin: 'https://oauth.reddit.com',
-            path: 'api/{version}/{path}',
-            version: 'v1',
+            origin: "https://oauth.reddit.com",
+            path: "api/{version}/{path}",
+            version: "v1",
             headers: {
-              Authorization: 'Bearer {auth}',
-              'user-agent': 'strapi',
+              Authorization: "Bearer {auth}",
+              "user-agent": "strapi",
             },
           },
         },
@@ -249,7 +310,7 @@ const getInitialProviders = ({ purest }) => ({
     });
 
     return reddit
-      .get('me')
+      .get("me")
       .auth(accessToken)
       .request()
       .then(({ body }) => ({
@@ -258,16 +319,21 @@ const getInitialProviders = ({ purest }) => ({
       }));
   },
   async auth0({ accessToken, providers }) {
-    const auth0 = purest({ provider: 'auth0' });
+    const auth0 = purest({ provider: "auth0" });
 
     return auth0
-      .get('userinfo')
+      .get("userinfo")
       .subdomain(providers.auth0.subdomain)
       .auth(accessToken)
       .request()
       .then(({ body }) => {
-        const username = body.username || body.nickname || body.name || body.email.split('@')[0];
-        const email = body.email || `${username.replace(/\s+/g, '.')}@strapi.io`;
+        const username =
+          body.username ||
+          body.nickname ||
+          body.name ||
+          body.email.split("@")[0];
+        const email =
+          body.email || `${username.replace(/\s+/g, ".")}@strapi.io`;
 
         return {
           username,
@@ -276,10 +342,10 @@ const getInitialProviders = ({ purest }) => ({
       });
   },
   async cas({ accessToken, providers }) {
-    const cas = purest({ provider: 'cas' });
+    const cas = purest({ provider: "cas" });
 
     return cas
-      .get('oidc/profile')
+      .get("oidc/profile")
       .subdomain(providers.cas.subdomain)
       .auth(accessToken)
       .request()
@@ -293,7 +359,9 @@ const getInitialProviders = ({ purest }) => ({
           : body.strapiemail || body.email;
         if (!username || !email) {
           strapi.log.warn(
-            `CAS Response Body did not contain required attributes: ${JSON.stringify(body)}`
+            `CAS Response Body did not contain required attributes: ${JSON.stringify(
+              body
+            )}`
           );
         }
         return {
@@ -304,14 +372,14 @@ const getInitialProviders = ({ purest }) => ({
   },
   async patreon({ accessToken }) {
     const patreon = purest({
-      provider: 'patreon',
+      provider: "patreon",
       config: {
         patreon: {
           default: {
-            origin: 'https://www.patreon.com',
-            path: 'api/oauth2/{path}',
+            origin: "https://www.patreon.com",
+            path: "api/oauth2/{path}",
             headers: {
-              authorization: 'Bearer {auth}',
+              authorization: "Bearer {auth}",
             },
           },
         },
@@ -319,9 +387,9 @@ const getInitialProviders = ({ purest }) => ({
     });
 
     return patreon
-      .get('v2/identity')
+      .get("v2/identity")
       .auth(accessToken)
-      .qs(new URLSearchParams({ 'fields[user]': 'full_name,email' }).toString())
+      .qs(new URLSearchParams({ "fields[user]": "full_name,email" }).toString())
       .request()
       .then(({ body }) => {
         const patreonData = body.data.attributes;
@@ -333,22 +401,51 @@ const getInitialProviders = ({ purest }) => ({
   },
 });
 
-module.exports = () => {
-  const purest = require('purest');
+/**
+ * @function providerCbFactory
+ * @param {Object} ctx - provider name
+ * @param {Object} ctx.purest - Purest Instance
+ * @returns {ProviderCallback}
+ */
+
+/**
+ * ProvidersRegistry module callback
+ */
+const providersRegistryCb = () => {
+  const purest = require("purest");
 
   const providersCallbacks = getInitialProviders({ purest });
 
   return {
+    /**
+     *
+     * @param {string} providerName
+     * @param {ProviderCbFactory} provider
+     */
     register(providerName, provider) {
-      assert(typeof providerName === 'string', 'Provider name must be a string');
-      assert(typeof provider === 'function', 'Provider callback must be a function');
+      assert(
+        typeof providerName === "string",
+        "Provider name must be a string"
+      );
+      assert(
+        typeof provider === "function",
+        "Provider callback must be a function"
+      );
 
       providersCallbacks[providerName] = provider({ purest });
     },
-
+    /**
+     *
+     * @param {Object} ctx - functions context parameter
+     * @param {string} ctx.provider - The provider name
+     * @param {string} ctx.accessToken - The accessToken received after the provider cb
+     * @param {Object<string, string>} ctx.query - Parsed request query
+     * @param {InitialProviders & Object<string, ProviderCallback>} ctx.providers - Object with the registered providers
+     * @returns {Promise<UserData>}
+     */
     async run({ provider, accessToken, query, providers }) {
       if (!providersCallbacks[provider]) {
-        throw new Error('Unknown provider.');
+        throw new Error("Unknown provider.");
       }
 
       const providerCb = providersCallbacks[provider];
@@ -357,3 +454,5 @@ module.exports = () => {
     },
   };
 };
+
+module.exports = providersRegistryCb;

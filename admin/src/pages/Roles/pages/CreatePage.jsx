@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
   Button,
@@ -11,7 +11,7 @@ import {
   Textarea,
   TextInput,
   Typography,
-} from '@strapi/design-system';
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   Form,
@@ -20,18 +20,19 @@ import {
   useNotification,
   useOverlayBlocker,
   useTracking,
-} from '@strapi/helper-plugin';
-import { Check } from '@strapi/icons';
-import { Formik } from 'formik';
-import { useIntl } from 'react-intl';
-import { useMutation } from 'react-query';
-import { useHistory } from 'react-router-dom';
+} from "@strapi/helper-plugin";
+import { Check } from "@strapi/icons";
+import { Formik } from "formik";
+import { useIntl } from "react-intl";
+import { useMutation } from "react-query";
+import { useHistory } from "react-router-dom";
 
-import UsersPermissions from '../../../components/UsersPermissions';
-import { PERMISSIONS } from '../../../constants';
-import getTrad from '../../../utils/getTrad';
-import { createRoleSchema } from '../constants';
-import { usePlugins } from '../hooks/usePlugins';
+import UsersPermissions from "../../../components/UsersPermissions";
+import pluginId from "../../../pluginId";
+import { PERMISSIONS } from "../../../constants";
+import getTrad from "../../../utils/getTrad";
+import { createRoleSchema } from "../constants";
+import { usePlugins } from "../hooks/usePlugins";
 
 export const CreatePage = () => {
   const { formatMessage } = useIntl();
@@ -42,25 +43,25 @@ export const CreatePage = () => {
   const { trackUsage } = useTracking();
   const permissionsRef = React.useRef();
   const { post } = useFetchClient();
-  const mutation = useMutation((body) => post(`/users-permissions/roles`, body), {
+  const mutation = useMutation((body) => post(`/${pluginId}/roles`, body), {
     onError() {
       toggleNotification({
-        type: 'warning',
+        type: "warning",
         message: {
-          id: 'notification.error',
-          defaultMessage: 'An error occurred',
+          id: "notification.error",
+          defaultMessage: "An error occurred",
         },
       });
     },
 
     onSuccess() {
-      trackUsage('didCreateRole');
+      trackUsage("didCreateRole");
 
       toggleNotification({
-        type: 'success',
+        type: "success",
         message: {
-          id: getTrad('Settings.roles.created'),
-          defaultMessage: 'Role created',
+          id: getTrad("Settings.roles.created"),
+          defaultMessage: "Role created",
         },
       });
 
@@ -88,7 +89,7 @@ export const CreatePage = () => {
       <SettingsPageTitle name="Roles" />
       <Formik
         enableReinitialize
-        initialValues={{ name: '', description: '' }}
+        initialValues={{ name: "", description: "" }}
         onSubmit={handleCreateRoleSubmit}
         validationSchema={createRoleSchema}
       >
@@ -97,21 +98,25 @@ export const CreatePage = () => {
             <HeaderLayout
               primaryAction={
                 !isLoadingPlugins && (
-                  <Button type="submit" loading={mutation.isLoading} startIcon={<Check />}>
+                  <Button
+                    type="submit"
+                    loading={mutation.isLoading}
+                    startIcon={<Check />}
+                  >
                     {formatMessage({
-                      id: 'global.save',
-                      defaultMessage: 'Save',
+                      id: "global.save",
+                      defaultMessage: "Save",
                     })}
                   </Button>
                 )
               }
               title={formatMessage({
-                id: 'Settings.roles.create.title',
-                defaultMessage: 'Create a role',
+                id: "Settings.roles.create.title",
+                defaultMessage: "Create a role",
               })}
               subtitle={formatMessage({
-                id: 'Settings.roles.create.description',
-                defaultMessage: 'Define the rights given to the role',
+                id: "Settings.roles.create.description",
+                defaultMessage: "Define the rights given to the role",
               })}
             />
             <ContentLayout>
@@ -130,8 +135,8 @@ export const CreatePage = () => {
                 <Flex direction="column" alignItems="stretch">
                   <Typography variant="delta" as="h2">
                     {formatMessage({
-                      id: getTrad('EditPage.form.roles'),
-                      defaultMessage: 'Role details',
+                      id: getTrad("EditPage.form.roles"),
+                      defaultMessage: "Role details",
                     })}
                   </Typography>
 
@@ -139,15 +144,18 @@ export const CreatePage = () => {
                     <GridItem col={6}>
                       <TextInput
                         name="name"
-                        value={values.name || ''}
+                        value={values.name || ""}
                         onChange={handleChange}
                         label={formatMessage({
-                          id: 'global.name',
-                          defaultMessage: 'Name',
+                          id: "global.name",
+                          defaultMessage: "Name",
                         })}
                         error={
                           errors?.name
-                            ? formatMessage({ id: errors.name, defaultMessage: 'Name is required' })
+                            ? formatMessage({
+                                id: errors.name,
+                                defaultMessage: "Name is required",
+                              })
                             : false
                         }
                         required
@@ -156,17 +164,17 @@ export const CreatePage = () => {
                     <GridItem col={6}>
                       <Textarea
                         id="description"
-                        value={values.description || ''}
+                        value={values.description || ""}
                         onChange={handleChange}
                         label={formatMessage({
-                          id: 'global.description',
-                          defaultMessage: 'Description',
+                          id: "global.description",
+                          defaultMessage: "Description",
                         })}
                         error={
                           errors?.description
                             ? formatMessage({
                                 id: errors.description,
-                                defaultMessage: 'Description is required',
+                                defaultMessage: "Description is required",
                               })
                             : false
                         }

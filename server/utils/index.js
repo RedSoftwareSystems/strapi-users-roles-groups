@@ -1,5 +1,6 @@
 "use strict";
 
+const pluginId = require("../pluginId.js");
 const sanitize = require("./sanitize");
 
 /**
@@ -9,7 +10,7 @@ const sanitize = require("./sanitize");
  * @returns {import("./index.d.ts").getService}
  */
 const getService = (name) => {
-  return strapi.plugin("users-permissions").service(name);
+  return strapi.plugin(pluginId).service(name);
 };
 
 module.exports = {

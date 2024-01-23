@@ -1,15 +1,16 @@
-'use strict';
+"use strict";
 
-const path = require('path');
-const utils = require('@strapi/utils');
-const { isString, has, toLower } = require('lodash/fp');
+const path = require("path");
+const utils = require("@strapi/utils");
+const { isString, has, toLower } = require("lodash/fp");
+const pluginId = require("../pluginId");
 
 const { RateLimitError } = utils.errors;
 
 module.exports =
   (config, { strapi }) =>
   async (ctx, next) => {
-    let rateLimitConfig = strapi.config.get('plugin.users-permissions.ratelimit');
+    let rateLimitConfig = strapi.config.get(`plugin.${pluginId}.ratelimit`);
 
     if (!rateLimitConfig) {
       rateLimitConfig = {
@@ -17,17 +18,18 @@ module.exports =
       };
     }
 
-    if (!has('enabled', rateLimitConfig)) {
+    if (!has("enabled", rateLimitConfig)) {
       rateLimitConfig.enabled = true;
     }
 
     if (rateLimitConfig.enabled === true) {
-      const rateLimit = require('koa2-ratelimit').RateLimit;
+      const rateLimit = require("koa2-ratelimit").RateLimit;
 
-      const userIdentifier = toLower(ctx.request.body.email) || 'unknownIdentifier';
+      const userIdentifier =
+        toLower(ctx.request.body.email) || "unknownIdentifier";
       const requestPath = isString(ctx.request.path)
         ? toLower(path.normalize(ctx.request.path))
-        : 'invalidPath';
+        : "invalidPath";
 
       const loadConfig = {
         interval: { min: 5 },

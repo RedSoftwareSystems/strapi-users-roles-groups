@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
   ContentLayout,
@@ -11,7 +11,7 @@ import {
   Typography,
   GridItem,
   Grid,
-} from '@strapi/design-system';
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   useOverlayBlocker,
@@ -22,18 +22,19 @@ import {
   useFetchClient,
   useNotification,
   Link,
-} from '@strapi/helper-plugin';
-import { ArrowLeft, Check } from '@strapi/icons';
-import { Formik } from 'formik';
-import { useIntl } from 'react-intl';
-import { useQuery, useMutation } from 'react-query';
-import { useRouteMatch } from 'react-router-dom';
+} from "@strapi/helper-plugin";
+import { ArrowLeft, Check } from "@strapi/icons";
+import { Formik } from "formik";
+import { useIntl } from "react-intl";
+import { useQuery, useMutation } from "react-query";
+import { useRouteMatch } from "react-router-dom";
 
-import UsersPermissions from '../../../components/UsersPermissions';
-import { PERMISSIONS } from '../../../constants';
-import getTrad from '../../../utils/getTrad';
-import { createRoleSchema } from '../constants';
-import { usePlugins } from '../hooks/usePlugins';
+import UsersPermissions from "../../../components/UsersPermissions";
+import pluginId from "../../../pluginId";
+import { PERMISSIONS } from "../../../constants";
+import getTrad from "../../../utils/getTrad";
+import { createRoleSchema } from "../constants";
+import { usePlugins } from "../hooks/usePlugins";
 
 export const EditPage = () => {
   const { formatMessage } = useIntl();
@@ -41,18 +42,18 @@ export const EditPage = () => {
   const { lockApp, unlockApp } = useOverlayBlocker();
   const {
     params: { id },
-  } = useRouteMatch(`/settings/users-permissions/roles/:id`);
+  } = useRouteMatch(`/settings/${pluginId}/roles/:id`);
   const { get } = useFetchClient();
   const { isLoading: isLoadingPlugins, routes } = usePlugins();
   const {
     data: role,
     isLoading: isLoadingRole,
     refetch: refetchRole,
-  } = useQuery(['users-permissions', 'role', id], async () => {
+  } = useQuery([pluginId, "role", id], async () => {
     // TODO: why doesn't this endpoint follow the admin API conventions?
     const {
       data: { role },
-    } = await get(`/users-permissions/roles/${id}`);
+    } = await get(`/${pluginId}/roles/${id}`);
 
     return role;
   });
@@ -60,26 +61,29 @@ export const EditPage = () => {
   const permissionsRef = React.useRef();
   const { put } = useFetchClient();
   const { formatAPIError } = useAPIErrorHandler();
-  const mutation = useMutation((body) => put(`/users-permissions/roles/${id}`, body), {
-    onError(error) {
-      toggleNotification({
-        type: 'warning',
-        message: formatAPIError(error),
-      });
-    },
+  const mutation = useMutation(
+    (body) => put(`/${pluginId}/roles/${id}`, body),
+    {
+      onError(error) {
+        toggleNotification({
+          type: "warning",
+          message: formatAPIError(error),
+        });
+      },
 
-    async onSuccess() {
-      toggleNotification({
-        type: 'success',
-        message: {
-          id: getTrad('Settings.roles.created'),
-          defaultMessage: 'Role edited',
-        },
-      });
+      async onSuccess() {
+        toggleNotification({
+          type: "success",
+          message: {
+            id: getTrad("Settings.roles.created"),
+            defaultMessage: "Role edited",
+          },
+        });
 
-      await refetchRole();
-    },
-  });
+        await refetchRole();
+      },
+    }
+  );
 
   const handleEditRoleSubmit = async (data) => {
     // Set loading state
@@ -112,14 +116,14 @@ export const EditPage = () => {
               primaryAction={
                 !isLoadingPlugins && (
                   <Button
-                    disabled={role.code === 'strapi-super-admin'}
+                    disabled={role.code === "strapi-super-admin"}
                     type="submit"
                     loading={mutation.isLoading}
                     startIcon={<Check />}
                   >
                     {formatMessage({
-                      id: 'global.save',
-                      defaultMessage: 'Save',
+                      id: "global.save",
+                      defaultMessage: "Save",
                     })}
                   </Button>
                 )
@@ -127,10 +131,13 @@ export const EditPage = () => {
               title={role.name}
               subtitle={role.description}
               navigationAction={
-                <Link startIcon={<ArrowLeft />} to="/settings/users-permissions/roles">
+                <Link
+                  startIcon={<ArrowLeft />}
+                  to={`/settings/${pluginId}/roles`}
+                >
                   {formatMessage({
-                    id: 'global.back',
-                    defaultMessage: 'Back',
+                    id: "global.back",
+                    defaultMessage: "Back",
                   })}
                 </Link>
               }
@@ -151,8 +158,8 @@ export const EditPage = () => {
                 <Flex direction="column" alignItems="stretch" gap={4}>
                   <Typography variant="delta" as="h2">
                     {formatMessage({
-                      id: getTrad('EditPage.form.roles'),
-                      defaultMessage: 'Role details',
+                      id: getTrad("EditPage.form.roles"),
+                      defaultMessage: "Role details",
                     })}
                   </Typography>
 
@@ -160,15 +167,18 @@ export const EditPage = () => {
                     <GridItem col={6}>
                       <TextInput
                         name="name"
-                        value={values.name || ''}
+                        value={values.name || ""}
                         onChange={handleChange}
                         label={formatMessage({
-                          id: 'global.name',
-                          defaultMessage: 'Name',
+                          id: "global.name",
+                          defaultMessage: "Name",
                         })}
                         error={
                           errors?.name
-                            ? formatMessage({ id: errors.name, defaultMessage: 'Name is required' })
+                            ? formatMessage({
+                                id: errors.name,
+                                defaultMessage: "Name is required",
+                              })
                             : false
                         }
                         required
@@ -177,17 +187,17 @@ export const EditPage = () => {
                     <GridItem col={6}>
                       <Textarea
                         id="description"
-                        value={values.description || ''}
+                        value={values.description || ""}
                         onChange={handleChange}
                         label={formatMessage({
-                          id: 'global.description',
-                          defaultMessage: 'Description',
+                          id: "global.description",
+                          defaultMessage: "Description",
                         })}
                         error={
                           errors?.description
                             ? formatMessage({
                                 id: errors.description,
-                                defaultMessage: 'Description is required',
+                                defaultMessage: "Description is required",
                               })
                             : false
                         }

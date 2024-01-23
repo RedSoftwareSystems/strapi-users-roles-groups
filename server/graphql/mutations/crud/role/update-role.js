@@ -1,9 +1,13 @@
-'use strict';
+"use strict";
 
-const usersPermissionsRoleUID = 'plugin::users-permissions.role';
+const pluginId = require("../../../../pluginId");
+
+const usersPermissionsRoleUID = `plugin::${pluginId}.role`;
 
 module.exports = ({ nexus, strapi }) => {
-  const { getContentTypeInputName } = strapi.plugin('graphql').service('utils').naming;
+  const { getContentTypeInputName } = strapi
+    .plugin("graphql")
+    .service("utils").naming;
   const { nonNull } = nexus;
 
   const roleContentType = strapi.getModel(usersPermissionsRoleUID);
@@ -11,14 +15,14 @@ module.exports = ({ nexus, strapi }) => {
   const roleInputName = getContentTypeInputName(roleContentType);
 
   return {
-    type: 'UsersPermissionsUpdateRolePayload',
+    type: "UsersPermissionsUpdateRolePayload",
 
     args: {
-      id: nonNull('ID'),
+      id: nonNull("ID"),
       data: nonNull(roleInputName),
     },
 
-    description: 'Update an existing role',
+    description: "Update an existing role",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
@@ -27,7 +31,7 @@ module.exports = ({ nexus, strapi }) => {
       koaContext.request.body = args.data;
       koaContext.request.body.role = args.id;
 
-      await strapi.plugin('users-permissions').controller('role').updateRole(koaContext);
+      await strapi.plugin(pluginId).controller("role").updateRole(koaContext);
 
       return { ok: true };
     },

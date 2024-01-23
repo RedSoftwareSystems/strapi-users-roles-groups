@@ -4,36 +4,33 @@
 // Here's the file: strapi/docs/3.0.0-beta.x/guides/registering-a-field-in-admin.md
 // Also the strapi-generate-plugins/files/admin/src/index.js needs to be updated
 // IF THE DOC IS NOT UPDATED THE PULL REQUEST WILL NOT BE MERGED
-import { prefixPluginTranslations } from '@strapi/helper-plugin';
+import { prefixPluginTranslations } from "@strapi/helper-plugin";
 
-import pluginPkg from '../../package.json';
-
-import { PERMISSIONS } from './constants';
-import getTrad from './utils/getTrad';
-
-const name = pluginPkg.strapi.name;
+import { PERMISSIONS } from "./constants";
+import getTrad from "./utils/getTrad";
+import pluginId from "./pluginId";
 
 export default {
   register(app) {
     // Create the plugin's settings section
     app.createSettingSection(
       {
-        id: 'users-permissions',
+        id: pluginId,
         intlLabel: {
-          id: getTrad('Settings.section-label'),
-          defaultMessage: 'Users & Permissions plugin',
+          id: getTrad("Settings.section-label"),
+          defaultMessage: "Users & Permissions plugin",
         },
       },
       [
         {
           intlLabel: {
-            id: 'global.roles',
-            defaultMessage: 'Roles',
+            id: "global.roles",
+            defaultMessage: "Roles",
           },
-          id: 'roles',
-          to: `/settings/users-permissions/roles`,
+          id: "roles",
+          to: `/settings/${pluginId}/roles`,
           async Component() {
-            const component = await import('./pages/Roles');
+            const component = await import("./pages/Roles");
 
             return component;
           },
@@ -41,13 +38,13 @@ export default {
         },
         {
           intlLabel: {
-            id: getTrad('HeaderNav.link.providers'),
-            defaultMessage: 'Providers',
+            id: getTrad("HeaderNav.link.providers"),
+            defaultMessage: "Providers",
           },
-          id: 'providers',
-          to: `/settings/users-permissions/providers`,
+          id: "providers",
+          to: `/settings/${pluginId}/providers`,
           async Component() {
-            const component = await import('./pages/Providers');
+            const component = await import("./pages/Providers");
 
             return component;
           },
@@ -55,13 +52,13 @@ export default {
         },
         {
           intlLabel: {
-            id: getTrad('HeaderNav.link.emailTemplates'),
-            defaultMessage: 'Email templates',
+            id: getTrad("HeaderNav.link.emailTemplates"),
+            defaultMessage: "Email templates",
           },
-          id: 'email-templates',
-          to: `/settings/users-permissions/email-templates`,
+          id: "email-templates",
+          to: `/settings/${pluginId}/email-templates`,
           async Component() {
-            const component = await import('./pages/EmailTemplates');
+            const component = await import("./pages/EmailTemplates");
 
             return component;
           },
@@ -69,13 +66,13 @@ export default {
         },
         {
           intlLabel: {
-            id: getTrad('HeaderNav.link.advancedSettings'),
-            defaultMessage: 'Advanced Settings',
+            id: getTrad("HeaderNav.link.advancedSettings"),
+            defaultMessage: "Advanced Settings",
           },
-          id: 'advanced-settings',
-          to: `/settings/users-permissions/advanced-settings`,
+          id: "advanced-settings",
+          to: `/settings/${pluginId}/advanced-settings`,
           async Component() {
-            const component = await import('./pages/AdvancedSettings');
+            const component = await import("./pages/AdvancedSettings");
 
             return component;
           },
@@ -85,8 +82,8 @@ export default {
     );
 
     app.registerPlugin({
-      id: 'users-permissions',
-      name,
+      id: pluginId,
+      name: pluginId,
     });
   },
   bootstrap() {},
@@ -96,7 +93,7 @@ export default {
         return import(`./translations/${locale}.json`)
           .then(({ default: data }) => {
             return {
-              data: prefixPluginTranslations(data, 'users-permissions'),
+              data: prefixPluginTranslations(data, pluginId),
               locale,
             };
           })

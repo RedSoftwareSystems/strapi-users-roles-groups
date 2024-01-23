@@ -1,6 +1,5 @@
 "use strict";
-const packageJson = require("../../package.json");
-const pluginName = packageJson.strapi.name;
+const pluginName = require("../pluginId");
 
 /**
  * The Grant provider type.
@@ -23,28 +22,28 @@ const pluginActions = {
       displayName: "Create",
       uid: "roles.create",
       subCategory: "roles",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Read",
       uid: "roles.read",
       subCategory: "roles",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Update",
       uid: "roles.update",
       subCategory: "roles",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Delete",
       uid: "roles.delete",
       subCategory: "roles",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       // providers
@@ -52,14 +51,14 @@ const pluginActions = {
       displayName: "Read",
       uid: "providers.read",
       subCategory: "providers",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Edit",
       uid: "providers.update",
       subCategory: "providers",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       // emailTemplates
@@ -67,14 +66,14 @@ const pluginActions = {
       displayName: "Read",
       uid: "email-templates.read",
       subCategory: "emailTemplates",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Edit",
       uid: "email-templates.update",
       subCategory: "emailTemplates",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       // advancedSettings
@@ -82,14 +81,14 @@ const pluginActions = {
       displayName: "Read",
       uid: "advanced-settings.read",
       subCategory: "advancedSettings",
-      pluginName: "users-permissions",
+      pluginName,
     },
     {
       section: "plugins",
       displayName: "Edit",
       uid: "advanced-settings.update",
       subCategory: "advancedSettings",
-      pluginName: "users-permissions",
+      pluginName,
     },
   ],
 };

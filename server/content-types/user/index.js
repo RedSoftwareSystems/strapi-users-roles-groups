@@ -1,9 +1,10 @@
 "use strict";
 
+const pluginId = require("../../pluginId");
 const schemaConfig = require("./schema-config");
 
 const userSchema = {
-  collectionName: "up_users",
+  collectionName: "eup_users",
   info: {
     name: "user",
     description: "",
@@ -62,10 +63,10 @@ const userSchema = {
       default: false,
       configurable: false,
     },
-    role: {
+    roles: {
       type: "relation",
-      relation: "manyToOne",
-      target: "plugin::users-permissions.role",
+      relation: "manyToMany",
+      target: `plugin::${pluginId}.role`,
       inversedBy: "users",
       configurable: false,
     },

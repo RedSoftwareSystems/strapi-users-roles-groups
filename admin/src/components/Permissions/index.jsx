@@ -1,14 +1,20 @@
-import React, { useReducer } from 'react';
+import React, { useReducer } from "react";
 
-import { Accordion, AccordionContent, AccordionToggle, Flex } from '@strapi/design-system';
-import { useIntl } from 'react-intl';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionToggle,
+  Flex,
+} from "@strapi/design-system";
+import { useIntl } from "react-intl";
 
-import { useUsersPermissions } from '../../contexts/UsersPermissionsContext';
-import formatPluginName from '../../utils/formatPluginName';
+import { useUsersPermissions } from "../../contexts/UsersPermissionsContext";
+import formatPluginName from "../../utils/formatPluginName";
+import pluginId from "../../pluginId";
 
-import init from './init';
-import PermissionRow from './PermissionRow';
-import { initialState, reducer } from './reducer';
+import init from "./init";
+import PermissionRow from "./PermissionRow";
+import { initialState, reducer } from "./reducer";
 
 const Permissions = () => {
   const { modifiedData } = useUsersPermissions();
@@ -19,7 +25,7 @@ const Permissions = () => {
 
   const handleToggle = (index) =>
     dispatch({
-      type: 'TOGGLE_COLLAPSE',
+      type: "TOGGLE_COLLAPSE",
       index,
     });
 
@@ -30,21 +36,25 @@ const Permissions = () => {
           expanded={collapse.isOpen}
           onToggle={() => handleToggle(index)}
           key={collapse.name}
-          variant={index % 2 === 0 ? 'secondary' : undefined}
+          variant={index % 2 === 0 ? "secondary" : undefined}
         >
           <AccordionToggle
             title={formatPluginName(collapse.name)}
             description={formatMessage(
               {
-                id: 'users-permissions.Plugin.permissions.plugins.description',
-                defaultMessage: 'Define all allowed actions for the {name} plugin.',
+                id: `${pluginId}.Plugin.permissions.plugins.description`,
+                defaultMessage:
+                  "Define all allowed actions for the {name} plugin.",
               },
               { name: collapse.name }
             )}
-            variant={index % 2 ? 'primary' : 'secondary'}
+            variant={index % 2 ? "primary" : "secondary"}
           />
           <AccordionContent>
-            <PermissionRow permissions={modifiedData[collapse.name]} name={collapse.name} />
+            <PermissionRow
+              permissions={modifiedData[collapse.name]}
+              name={collapse.name}
+            />
           </AccordionContent>
         </Accordion>
       ))}

@@ -1,6 +1,11 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { ContentLayout, HeaderLayout, Main, useNotifyAT } from '@strapi/design-system';
+import {
+  ContentLayout,
+  HeaderLayout,
+  Main,
+  useNotifyAT,
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   LoadingIndicatorPage,
@@ -12,15 +17,16 @@ import {
   useOverlayBlocker,
   useRBAC,
   useTracking,
-} from '@strapi/helper-plugin';
-import { useIntl } from 'react-intl';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+} from "@strapi/helper-plugin";
+import { useIntl } from "react-intl";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import { PERMISSIONS } from '../../constants';
-import { getTrad } from '../../utils';
+import { PERMISSIONS } from "../../constants";
+import { getTrad } from "../../utils";
+import pluginId from "../../pluginId";
 
-import EmailForm from './components/EmailForm';
-import EmailTable from './components/EmailTable';
+import EmailForm from "./components/EmailForm";
+import EmailTable from "./components/EmailTable";
 
 const ProtectedEmailTemplatesPage = () => (
   <CheckPagePermissions permissions={PERMISSIONS.readEmailTemplates}>
@@ -49,9 +55,9 @@ const EmailTemplatesPage = () => {
   } = useRBAC({ update: PERMISSIONS.updateEmailTemplates });
 
   const { isLoading: isLoadingData, data } = useQuery(
-    ['users-permissions', 'email-templates'],
+    [pluginId, "email-templates"],
     async () => {
-      const { data } = await get('/users-permissions/email-templates');
+      const { data } = await get(`/${pluginId}/email-templates`);
 
       return data;
     },
@@ -59,14 +65,14 @@ const EmailTemplatesPage = () => {
       onSuccess() {
         notifyStatus(
           formatMessage({
-            id: getTrad('Email.template.data.loaded'),
-            defaultMessage: 'Email templates has been loaded',
+            id: getTrad("Email.template.data.loaded"),
+            defaultMessage: "Email templates has been loaded",
           })
         );
       },
       onError(error) {
         toggleNotification({
-          type: 'warning',
+          type: "warning",
           message: formatAPIError(error),
         });
       },
@@ -85,24 +91,27 @@ const EmailTemplatesPage = () => {
   };
 
   const submitMutation = useMutation(
-    (body) => put('/users-permissions/email-templates', { 'email-templates': body }),
+    (body) => put(`/${pluginId}/email-templates`, { "email-templates": body }),
     {
       async onSuccess() {
-        await queryClient.invalidateQueries(['users-permissions', 'email-templates']);
+        await queryClient.invalidateQueries([pluginId, "email-templates"]);
 
         toggleNotification({
-          type: 'success',
-          message: { id: 'notification.success.saved', defaultMessage: 'Saved' },
+          type: "success",
+          message: {
+            id: "notification.success.saved",
+            defaultMessage: "Saved",
+          },
         });
 
-        trackUsage('didEditEmailTemplates');
+        trackUsage("didEditEmailTemplates");
 
         unlockApp();
         handleToggle();
       },
       onError(error) {
         toggleNotification({
-          type: 'warning',
+          type: "warning",
           message: formatAPIError(error),
         });
 
@@ -115,7 +124,7 @@ const EmailTemplatesPage = () => {
   const handleSubmit = (body) => {
     lockApp();
 
-    trackUsage('willEditEmailTemplates');
+    trackUsage("willEditEmailTemplates");
 
     const editedTemplates = { ...data, [templateToEdit]: body };
     submitMutation.mutate(editedTemplates);
@@ -126,14 +135,14 @@ const EmailTemplatesPage = () => {
       <Main aria-busy="true">
         <SettingsPageTitle
           name={formatMessage({
-            id: getTrad('HeaderNav.link.emailTemplates'),
-            defaultMessage: 'Email templates',
+            id: getTrad("HeaderNav.link.emailTemplates"),
+            defaultMessage: "Email templates",
           })}
         />
         <HeaderLayout
           title={formatMessage({
-            id: getTrad('HeaderNav.link.emailTemplates'),
-            defaultMessage: 'Email templates',
+            id: getTrad("HeaderNav.link.emailTemplates"),
+            defaultMessage: "Email templates",
           })}
         />
         <ContentLayout>
@@ -147,14 +156,14 @@ const EmailTemplatesPage = () => {
     <Main aria-busy={submitMutation.isLoading}>
       <SettingsPageTitle
         name={formatMessage({
-          id: getTrad('HeaderNav.link.emailTemplates'),
-          defaultMessage: 'Email templates',
+          id: getTrad("HeaderNav.link.emailTemplates"),
+          defaultMessage: "Email templates",
         })}
       />
       <HeaderLayout
         title={formatMessage({
-          id: getTrad('HeaderNav.link.emailTemplates'),
-          defaultMessage: 'Email templates',
+          id: getTrad("HeaderNav.link.emailTemplates"),
+          defaultMessage: "Email templates",
         })}
       />
       <ContentLayout>

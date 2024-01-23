@@ -8,6 +8,7 @@
  * run jobs, or perform some special logic.
  */
 
+const pluginId = require("../pluginId");
 const urljoin = require("url-join");
 
 const { getService } = require("../utils");
@@ -119,7 +120,7 @@ const initAdvancedOptions = async (pluginStore) => {
 const userSchemaAdditions = () => {
   const defaultSchema = Object.keys(userSchema.attributes);
   const currentSchema = Object.keys(
-    strapi.contentTypes["plugin::users-permissions.user"].attributes
+    strapi.contentTypes[`plugin::${pluginId}.user`].attributes
   );
 
   // Some dynamic fields may not have been initialized yet, so we need to ignore them
@@ -157,7 +158,7 @@ const bootstrapCb = async ({ strapi }) => {
 
   const pluginStore = strapi.store({
     type: "plugin",
-    name: "users-permissions",
+    name: pluginId,
   });
 
   await initGrant(pluginStore);
@@ -170,17 +171,17 @@ const bootstrapCb = async ({ strapi }) => {
 
   await getService("users-permissions").initialize();
 
-  if (!strapi.config.get("plugin.users-permissions.jwtSecret")) {
+  if (!strapi.config.get(`plugin.${pluginId}.jwtSecret`)) {
     if (process.env.NODE_ENV !== "development") {
       throw new Error(
-        `Missing jwtSecret. Please, set configuration variable "jwtSecret" for the users-permissions plugin in config/plugins.js (ex: you can generate one using Node with \`crypto.randomBytes(16).toString('base64')\`).
+        `Missing jwtSecret. Please, set configuration variable "jwtSecret" for the ${pluginId} plugin in config/plugins.js (ex: you can generate one using Node with \`crypto.randomBytes(16).toString('base64')\`).
 For security reasons, prefer storing the secret in an environment variable and read it in config/plugins.js. See https://docs.strapi.io/developer-docs/latest/setup-deployment-guides/configurations/optional/environment.html#configuration-using-environment-variables.`
       );
     }
 
     const jwtSecret = crypto.randomBytes(16).toString("base64");
 
-    strapi.config.set("plugin.users-permissions.jwtSecret", jwtSecret);
+    strapi.config.set(`plugin.${pluginId}.jwtSecret`, jwtSecret);
 
     if (!process.env.JWT_SECRET) {
       const envPath = process.env.ENV_PATH || ".env";
@@ -192,15 +193,14 @@ For security reasons, prefer storing the secret in an environment variable and r
   }
 
   // TODO v5: Remove this block of code and default allowedFields to empty array
-  if (
-    strapi.config.get("plugin.users-permissions.register.allowedFields")
-      ?.entries
-  ) {
+  if (strapi.config.get(`plugin.${pluginId}.register.allowedFields`)?.entries) {
     const modifications = userSchemaAdditions();
     if (modifications.length) {
       // if there is a potential vulnerability, show a warning
       strapi.log.warn(
-        `Users-permissions registration has defaulted to accepting the following additional user fields during registration: ${modifications.join(
+        `${
+          pluginId.ca
+        } registration has defaulted to accepting the following additional user fields during registration: ${modifications.join(
           ","
         )}`
       );

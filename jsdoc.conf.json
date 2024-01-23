@@ -1,0 +1,8 @@
+{
+  "plugins": [
+    "plugins/markdown",
+
+    "node_modules/jsdoc-tsimport-plugin/index.js",
+    "jsdoc-plugin-intersection"
+  ]
+}

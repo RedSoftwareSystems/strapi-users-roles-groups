@@ -1,16 +1,17 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
 
-const { checkBadRequest } = require('../../../utils');
+const { checkBadRequest } = require("../../../utils");
+const pluginId = require("../../../../pluginId");
 
-const usersPermissionsUserUID = 'plugin::users-permissions.user';
+const usersPermissionsUserUID = `plugin::${pluginId}.user`;
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
   const { getContentTypeInputName, getEntityResponseName } = strapi
-    .plugin('graphql')
-    .service('utils').naming;
+    .plugin("graphql")
+    .service("utils").naming;
 
   const userContentType = strapi.getModel(usersPermissionsUserUID);
 
@@ -21,11 +22,11 @@ module.exports = ({ nexus, strapi }) => {
     type: nonNull(responseName),
 
     args: {
-      id: nonNull('ID'),
+      id: nonNull("ID"),
       data: nonNull(userInputName),
     },
 
-    description: 'Update an existing user',
+    description: "Update an existing user",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
@@ -33,13 +34,13 @@ module.exports = ({ nexus, strapi }) => {
       koaContext.params = { id: args.id };
       koaContext.request.body = toPlainObject(args.data);
 
-      await strapi.plugin('users-permissions').controller('user').update(koaContext);
+      await strapi.plugin(pluginId).controller("user").update(koaContext);
 
       checkBadRequest(koaContext.body);
 
       return {
         value: koaContext.body,
-        info: { args, resourceUID: 'plugin::users-permissions.user' },
+        info: { args, resourceUID: `plugin::${pluginId}.user` },
       };
     },
   };

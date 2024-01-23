@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
   ContentLayout,
@@ -14,7 +14,7 @@ import {
   Tr,
   Typography,
   VisuallyHidden,
-} from '@strapi/design-system';
+} from "@strapi/design-system";
 import {
   CheckPagePermissions,
   LoadingIndicatorPage,
@@ -29,17 +29,18 @@ import {
   useOverlayBlocker,
   useRBAC,
   useTracking,
-} from '@strapi/helper-plugin';
-import { Pencil } from '@strapi/icons';
-import upperFirst from 'lodash/upperFirst';
-import { useIntl } from 'react-intl';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+} from "@strapi/helper-plugin";
+import { Pencil } from "@strapi/icons";
+import upperFirst from "lodash/upperFirst";
+import { useIntl } from "react-intl";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
-import FormModal from '../../components/FormModal';
-import { PERMISSIONS } from '../../constants';
-import { getTrad } from '../../utils';
+import FormModal from "../../components/FormModal";
+import { PERMISSIONS } from "../../constants";
+import { getTrad } from "../../utils";
+import pluginId from "../../pluginId";
 
-import forms from './utils/forms';
+import forms from "./utils/forms";
 
 export const ProvidersPage = () => {
   const { formatMessage, locale } = useIntl();
@@ -52,7 +53,7 @@ export const ProvidersPage = () => {
   const { get, put } = useFetchClient();
   const { formatAPIError } = useAPIErrorHandler();
   const formatter = useCollator(locale, {
-    sensitivity: 'base',
+    sensitivity: "base",
   });
 
   useFocusWhenNavigate();
@@ -63,9 +64,9 @@ export const ProvidersPage = () => {
   } = useRBAC({ update: PERMISSIONS.updateProviders });
 
   const { isLoading: isLoadingData, data } = useQuery(
-    ['users-permissions', 'get-providers'],
+    [pluginId, "get-providers"],
     async () => {
-      const { data } = await get('/users-permissions/providers');
+      const { data } = await get(`/${pluginId}/providers`);
 
       return data;
     },
@@ -74,30 +75,33 @@ export const ProvidersPage = () => {
     }
   );
 
-  const submitMutation = useMutation((body) => put('/users-permissions/providers', body), {
-    async onSuccess() {
-      await queryClient.invalidateQueries(['users-permissions', 'providers']);
+  const submitMutation = useMutation(
+    (body) => put(`/${pluginId}/providers`, body),
+    {
+      async onSuccess() {
+        await queryClient.invalidateQueries([pluginId, "providers"]);
 
-      toggleNotification({
-        type: 'success',
-        message: { id: getTrad('notification.success.submit') },
-      });
+        toggleNotification({
+          type: "success",
+          message: { id: getTrad("notification.success.submit") },
+        });
 
-      trackUsage('didEditAuthenticationProvider');
+        trackUsage("didEditAuthenticationProvider");
 
-      handleToggleModal();
-      unlockApp();
-    },
-    onError(error) {
-      toggleNotification({
-        type: 'warning',
-        message: formatAPIError(error),
-      });
+        handleToggleModal();
+        unlockApp();
+      },
+      onError(error) {
+        toggleNotification({
+          type: "warning",
+          message: formatAPIError(error),
+        });
 
-      unlockApp();
-    },
-    refetchActive: false,
-  });
+        unlockApp();
+      },
+      refetchActive: false,
+    }
+  );
 
   const providers = Object.entries(data)
     .reduce((acc, [name, provider]) => {
@@ -105,7 +109,7 @@ export const ProvidersPage = () => {
 
       acc.push({
         name,
-        icon: icon === 'envelope' ? ['fas', 'envelope'] : ['fab', icon],
+        icon: icon === "envelope" ? ["fas", "envelope"] : ["fab", icon],
         enabled,
         subdomain,
       });
@@ -121,13 +125,15 @@ export const ProvidersPage = () => {
       return false;
     }
 
-    const providerToEdit = providers.find((obj) => obj.name === providerToEditName);
+    const providerToEdit = providers.find(
+      (obj) => obj.name === providerToEditName
+    );
 
     return !!providerToEdit?.subdomain;
   }, [providers, providerToEditName]);
 
   const layoutToRender = React.useMemo(() => {
-    if (providerToEditName === 'email') {
+    if (providerToEditName === "email") {
       return forms.email;
     }
 
@@ -152,24 +158,26 @@ export const ProvidersPage = () => {
   const handleSubmit = async (values) => {
     lockApp();
 
-    trackUsage('willEditAuthenticationProvider');
+    trackUsage("willEditAuthenticationProvider");
 
-    submitMutation.mutate({ providers: { ...data, [providerToEditName]: values } });
+    submitMutation.mutate({
+      providers: { ...data, [providerToEditName]: values },
+    });
   };
 
   return (
     <Layout>
       <SettingsPageTitle
         name={formatMessage({
-          id: getTrad('HeaderNav.link.providers'),
-          defaultMessage: 'Providers',
+          id: getTrad("HeaderNav.link.providers"),
+          defaultMessage: "Providers",
         })}
       />
       <Main>
         <HeaderLayout
           title={formatMessage({
-            id: getTrad('HeaderNav.link.providers'),
-            defaultMessage: 'Providers',
+            id: getTrad("HeaderNav.link.providers"),
+            defaultMessage: "Providers",
           })}
         />
         {isLoading ? (
@@ -181,20 +189,26 @@ export const ProvidersPage = () => {
                 <Tr>
                   <Th>
                     <Typography variant="sigma" textColor="neutral600">
-                      {formatMessage({ id: 'global.name', defaultMessage: 'Name' })}
+                      {formatMessage({
+                        id: "global.name",
+                        defaultMessage: "Name",
+                      })}
                     </Typography>
                   </Th>
                   <Th>
                     <Typography variant="sigma" textColor="neutral600">
-                      {formatMessage({ id: getTrad('Providers.status'), defaultMessage: 'Status' })}
+                      {formatMessage({
+                        id: getTrad("Providers.status"),
+                        defaultMessage: "Status",
+                      })}
                     </Typography>
                   </Th>
                   <Th>
                     <Typography variant="sigma">
                       <VisuallyHidden>
                         {formatMessage({
-                          id: 'global.settings',
-                          defaultMessage: 'Settings',
+                          id: "global.settings",
+                          defaultMessage: "Settings",
                         })}
                       </VisuallyHidden>
                     </Typography>
@@ -217,17 +231,19 @@ export const ProvidersPage = () => {
                     </Td>
                     <Td width="65%">
                       <Typography
-                        textColor={provider.enabled ? 'success600' : 'danger600'}
+                        textColor={
+                          provider.enabled ? "success600" : "danger600"
+                        }
                         data-testid={`enable-${provider.name}`}
                       >
                         {provider.enabled
                           ? formatMessage({
-                              id: 'global.enabled',
-                              defaultMessage: 'Enabled',
+                              id: "global.enabled",
+                              defaultMessage: "Enabled",
                             })
                           : formatMessage({
-                              id: 'global.disabled',
-                              defaultMessage: 'Disabled',
+                              id: "global.disabled",
+                              defaultMessage: "Disabled",
                             })}
                       </Typography>
                     </Td>
@@ -255,8 +271,8 @@ export const ProvidersPage = () => {
         layout={layoutToRender}
         headerBreadcrumbs={[
           formatMessage({
-            id: getTrad('PopUpForm.header.edit.providers'),
-            defaultMessage: 'Edit Provider',
+            id: getTrad("PopUpForm.header.edit.providers"),
+            defaultMessage: "Edit Provider",
           }),
           upperFirst(providerToEditName),
         ]}

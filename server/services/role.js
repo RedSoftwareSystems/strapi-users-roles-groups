@@ -1,177 +1,217 @@
-'use strict';
+"use strict";
 
-const _ = require('lodash');
-const { NotFoundError } = require('@strapi/utils').errors;
-const { getService } = require('../utils');
+/**
+ * @module services/role
+ */
 
+/**
+ * @typedef {import("../types/entries").RoleActionsPermission} RoleActionsPermission
+ * @typedef {import("../types/entries").RolePermissions} RolePermissions
+ * @typedef {import("../types/entries").RoleAnyPermission} RoleAnyPermission
+ * @typedef {import("../types/entries").InputRole} InputRole
+ * @typedef {import("../types/entries").Permission} Permission
+ */
+
+/**
+ * @typedef {import("@strapi/types").EntityService.Params} Params
+ */
+
+/** @type {import("../types/entries")} */
+const pluginName = require("../pluginId");
+const { deburr, snakeCase, omit, pick } = require("lodash");
+const { NotFoundError } = require("@strapi/utils").errors;
+const { getService } = require("../utils");
+
+/**
+ * Roles service callback
+ *
+ * @param {Object} ctx
+ * @param {import("@strapi/types").Strapi} ctx.strapi
+ */
 module.exports = ({ strapi }) => ({
+  /**
+   * Creates a role
+   * @param {InputRole} params - Input data
+   * @return {Promise<RoleAnyPermission>}
+   */
   async createRole(params) {
     if (!params.type) {
-      params.type = _.snakeCase(_.deburr(_.toLower(params.name)));
+      params.type = snakeCase(deburr(params.name.toLowerCase()));
     }
 
     const role = await strapi
-      .query('plugin::users-permissions.role')
-      .create({ data: _.omit(params, ['users', 'permissions']) });
+      .query(`plugin::${pluginName}.role`)
+      .create({ data: omit(params, ["users", "permissions"]) });
 
-    const createPromises = _.flatMap(params.permissions, (type, typeName) => {
-      return _.flatMap(type.controllers, (controller, controllerName) => {
-        return _.reduce(
-          controller,
-          (acc, action, actionName) => {
-            const { enabled /* policy */ } = action;
-
-            if (enabled) {
-              const actionID = `${typeName}.${controllerName}.${actionName}`;
-
-              acc.push(
-                strapi
-                  .query('plugin::users-permissions.permission')
-                  .create({ data: { action: actionID, role: role.id } })
-              );
-            }
-
-            return acc;
-          },
-          []
-        );
-      });
-    });
+    const createPromises = Object.entries(params.permissions).flatMap(
+      ([permissionName, permission]) =>
+        Object.entries(permission.controllers).flatMap(
+          ([controllerName, controller]) =>
+            Object.entries(controller).reduce((acc, [actionName, action]) => {
+              const actionID = `${permissionName}.${controllerName}.${actionName}`;
+              if (action.enabled) {
+                acc.push(
+                  strapi
+                    .query(`plugin::${pluginName}.permission`)
+                    .create({ data: { action: actionID, role: role.id } })
+                );
+              }
+              return acc;
+            }, [])
+        )
+    );
 
     await Promise.all(createPromises);
   },
 
+  /**
+   * Finds a role by its id
+   * @param {number} roleID
+   * @returns {Promise<RoleActionsPermission>}
+   */
   async findOne(roleID) {
+    /**
+     * @type {Role<Permission[]}
+     */
     const role = await strapi
-      .query('plugin::users-permissions.role')
-      .findOne({ where: { id: roleID }, populate: ['permissions'] });
+      .query(`plugin::${pluginName}.role`)
+      .findOne({ where: { id: roleID }, populate: ["permissions"] });
 
     if (!role) {
-      throw new NotFoundError('Role not found');
+      throw new NotFoundError("Role not found");
     }
 
-    const allActions = getService('users-permissions').getActions();
+    const allActions = getService("users-permissions").getActions();
 
     // Group by `type`.
-    role.permissions.forEach((permission) => {
-      const [type, controller, action] = permission.action.split('.');
-
-      _.set(allActions, `${type}.controllers.${controller}.${action}`, {
-        enabled: true,
-        policy: '',
-      });
-    });
+    const permissions = role.permissions.reduce((acc, permission) => {
+      const [type, controller, action] = permission.action.split(".");
+      return {
+        ...acc,
+        [`${type}.controllers.${controller}.${action}`]: {
+          enabled: true,
+          policy: "",
+        },
+      };
+    }, allActions);
 
     return {
       ...role,
-      permissions: allActions,
+      permissions,
     };
   },
 
+  /**
+   * Returns all roles with associated users conunt
+   * @returns {Promise<RoleAnyPermission[]>
+   */
   async find() {
-    const roles = await strapi.query('plugin::users-permissions.role').findMany({ sort: ['name'] });
+    /**
+     * @type {Role[]}
+     */
+    const roles = await strapi
+      .query(`plugin::${pluginName}.role`)
+      .findMany({ sort: ["name"], populate: { users: { select: ["id"] } } });
 
-    for (const role of roles) {
-      role.nb_users = await strapi
-        .query('plugin::users-permissions.user')
-        .count({ where: { role: { id: role.id } } });
-    }
-
-    return roles;
+    return roles.map((role) => ({
+      ...role,
+      nb_users: role.users?.length || 0,
+    }));
   },
 
-  async updateRole(roleID, data) {
+  /**
+   * Updates a Role
+   *
+   * @param {number} roleID
+   * @param {InputRole} inputData
+   *
+   * @returns {Promise<void>}
+   */
+  async updateRole(roleID, inputData) {
+    /**
+     * @type {RolePermissions} - Role and permission
+     */
     const role = await strapi
-      .query('plugin::users-permissions.role')
-      .findOne({ where: { id: roleID }, populate: ['permissions'] });
+      .query(`plugin::${pluginName}.role`)
+      .findOne({ where: { id: roleID }, populate: ["permissions"] });
 
     if (!role) {
-      throw new NotFoundError('Role not found');
+      throw new NotFoundError("Role not found");
     }
 
-    await strapi.query('plugin::users-permissions.role').update({
+    // Updates data and description for the selected role
+    await strapi.query(`plugin::${pluginName}.role`).update({
       where: { id: roleID },
-      data: _.pick(data, ['name', 'description']),
+      data: { name: inputData.name, description: inputData.description },
     });
 
-    const { permissions } = data;
+    /**
+     * @type {string[]}
+     */
+    const newActions = Object.entries(inputData.permissions).flatMap(
+      ([permissionName, permission]) =>
+        Object.entries(permission.controllers).flatMap(
+          ([controllerName, controller]) =>
+            Object.entries(controller).reduce((acc, [actionName, action]) => {
+              const actionID = `${permissionName}.${controllerName}.${actionName}`;
+              if (action.enabled) {
+                acc.push(`${permissionName}.${controllerName}.${actionName}`);
+              }
+              return acc;
+            }, [])
+        )
+    );
 
-    const newActions = _.flatMap(permissions, (type, typeName) => {
-      return _.flatMap(type.controllers, (controller, controllerName) => {
-        return _.reduce(
-          controller,
-          (acc, action, actionName) => {
-            const { enabled /* policy */ } = action;
+    /**
+     * @type {string[]}
+     */
+    const oldActions = role.permissions?.map(({ action }) => action) || [];
 
-            if (enabled) {
-              acc.push(`${typeName}.${controllerName}.${actionName}`);
-            }
+    /**
+     * @type {Permission[]}
+     */
+    const permissionsToDelete =
+      role.permissions?.reduce((acc, permission) => {
+        if (!newActions.includes(permission.action)) {
+          acc.push(permission);
+        }
+        return acc;
+      }, []) || [];
 
-            return acc;
-          },
-          []
-        );
-      });
-    });
-
-    const oldActions = role.permissions.map(({ action }) => action);
-
-    const toDelete = role.permissions.reduce((acc, permission) => {
-      if (!newActions.includes(permission.action)) {
-        acc.push(permission);
-      }
-      return acc;
-    }, []);
-
-    const toCreate = newActions
+    /**
+     * @type {Permission[]}
+     */
+    const actionsPremissionsToCreate = newActions
       .filter((action) => !oldActions.includes(action))
       .map((action) => ({ action, role: role.id }));
 
-    await Promise.all(
-      toDelete.map((permission) =>
-        strapi
-          .query('plugin::users-permissions.permission')
-          .delete({ where: { id: permission.id } })
-      )
-    );
+    await strapi.query(`plugin::${pluginName}.permission`).deleteMany({
+      where: { id: { $in: permissionsToDelete.map((p) => p.id) } },
+    });
 
-    await Promise.all(
-      toCreate.map((permissionInfo) =>
-        strapi.query('plugin::users-permissions.permission').create({ data: permissionInfo })
-      )
-    );
+    await strapi
+      .query(`plugin::${pluginName}.permission`)
+      .createMany({ data: actionsPermissionsToCreate });
   },
 
-  async deleteRole(roleID, publicRoleID) {
-    const role = await strapi
-      .query('plugin::users-permissions.role')
-      .findOne({ where: { id: roleID }, populate: ['users', 'permissions'] });
+  /**
+   * Deletes a role and its permissions
+   * @param {number} roleID
+   * @returns {Promise<void>}
+   */
+  async deleteRole(roleID) {
+    /**
+     * @type {RolePermissions}
+     */
+    const role = await strapi.query(`plugin::${pluginName}.role`).delete({
+      where: { id: roleID },
+      populate: { permissions: { id: true } },
+    });
 
-    if (!role) {
-      throw new NotFoundError('Role not found');
-    }
-
-    // Move users to guest role.
-    await Promise.all(
-      role.users.map((user) => {
-        return strapi.query('plugin::users-permissions.user').update({
-          where: { id: user.id },
-          data: { role: publicRoleID },
-        });
-      })
-    );
-
-    // Remove permissions related to this role.
-    // TODO: use delete many
-    await Promise.all(
-      role.permissions.map((permission) => {
-        return strapi.query('plugin::users-permissions.permission').delete({
-          where: { id: permission.id },
-        });
-      })
-    );
-
-    // Delete the role.
-    await strapi.query('plugin::users-permissions.role').delete({ where: { id: roleID } });
+    await strapi.query(`plugin::${pluginName}.permission`).deleteMany({
+      where: {
+        id: { $in: role.permissions.map((permission) => permission.id) },
+      },
+    });
   },
 });

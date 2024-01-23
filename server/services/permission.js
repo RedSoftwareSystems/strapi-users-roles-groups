@@ -1,32 +1,47 @@
-'use strict';
+"use strict";
 
-const PUBLIC_ROLE_FILTER = { role: { type: 'public' } };
+const pluginName = require("../pluginId");
 
+/**
+ * @module services/permission
+ */
+
+/**
+ *
+ * @typedef {import("../types/entries").Permission} Permission
+ */
+
+const PUBLIC_ROLE_FILTER = { role: { type: "public" } };
+
+/**
+ * Permissions service callback
+ *
+ * @param {Object} ctx
+ * @param {import("@strapi/types").Strapi} ctx.strapi
+ */
 module.exports = ({ strapi }) => ({
   /**
    * Find permissions associated to a specific role ID
    *
    * @param {number} roleID
    *
-   * @return {object[]}
+   * @return {Promise<Permission[]>}
    */
   async findRolePermissions(roleID) {
-    return strapi.entityService.load(
-      'plugin::users-permissions.role',
-      { id: roleID },
-      'permissions'
-    );
+    return await strapi
+      .query(`plugin::${pluginName}.permission`)
+      .findMany({ where: { role: roleID } });
   },
 
   /**
    * Find permissions for the public role
    *
-   * @return {object[]}
+   * @return {Promise<Permission[]>}
    */
   async findPublicPermissions() {
-    return strapi.entityService.findMany('plugin::users-permissions.permission', {
-      filters: PUBLIC_ROLE_FILTER,
-    });
+    return await strapi
+      .query(`plugin::${pluginName}.permission`)
+      .findMany({ where: PUBLIC_ROLE_FILTER });
   },
 
   /**

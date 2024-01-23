@@ -1,21 +1,22 @@
-import React from 'react';
+import React from "react";
 
-import { Flex, GridItem, Typography } from '@strapi/design-system';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import without from 'lodash/without';
-import { useIntl } from 'react-intl';
+import { Flex, GridItem, Typography } from "@strapi/design-system";
+import get from "lodash/get";
+import isEmpty from "lodash/isEmpty";
+import without from "lodash/without";
+import { useIntl } from "react-intl";
+import pluginId from "../../pluginId";
 
-import { useUsersPermissions } from '../../contexts/UsersPermissionsContext';
-import BoundRoute from '../BoundRoute';
+import { useUsersPermissions } from "../../contexts/UsersPermissionsContext";
+import BoundRoute from "../BoundRoute";
 
 const Policies = () => {
   const { formatMessage } = useIntl();
   const { selectedAction, routes } = useUsersPermissions();
 
-  const path = without(selectedAction.split('.'), 'controllers');
+  const path = without(selectedAction.split("."), "controllers");
   const controllerRoutes = get(routes, path[0]);
-  const pathResolved = path.slice(1).join('.');
+  const pathResolved = path.slice(1).join(".");
 
   const displayedRoutes = isEmpty(controllerRoutes)
     ? []
@@ -29,7 +30,7 @@ const Policies = () => {
       paddingBottom={6}
       paddingLeft={7}
       paddingRight={7}
-      style={{ minHeight: '100%' }}
+      style={{ minHeight: "100%" }}
     >
       {selectedAction ? (
         <Flex direction="column" alignItems="stretch" gap={2}>
@@ -42,13 +43,13 @@ const Policies = () => {
         <Flex direction="column" alignItems="stretch" gap={2}>
           <Typography variant="delta" as="h3">
             {formatMessage({
-              id: 'users-permissions.Policies.header.title',
-              defaultMessage: 'Advanced settings',
+              id: `${pluginId}.Policies.header.title`,
+              defaultMessage: "Advanced settings",
             })}
           </Typography>
           <Typography as="p" textColor="neutral600">
             {formatMessage({
-              id: 'users-permissions.Policies.header.hint',
+              id: `${pluginId}.Policies.header.hint`,
               defaultMessage:
                 "Select the application's actions or the plugin's actions and click on the cog icon to display the bound route",
             })}

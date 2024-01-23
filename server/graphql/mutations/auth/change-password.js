@@ -1,29 +1,33 @@
-'use strict';
+"use strict";
 
-const { toPlainObject } = require('lodash/fp');
+const { toPlainObject } = require("lodash/fp");
 
-const { checkBadRequest } = require('../../utils');
+const { checkBadRequest } = require("../../utils");
+const pluginId = require("../../../pluginId");
 
 module.exports = ({ nexus, strapi }) => {
   const { nonNull } = nexus;
 
   return {
-    type: 'UsersPermissionsLoginPayload',
+    type: "UsersPermissionsLoginPayload",
 
     args: {
-      currentPassword: nonNull('String'),
-      password: nonNull('String'),
-      passwordConfirmation: nonNull('String'),
+      currentPassword: nonNull("String"),
+      password: nonNull("String"),
+      passwordConfirmation: nonNull("String"),
     },
 
-    description: 'Change user password. Confirm with the current password.',
+    description: "Change user password. Confirm with the current password.",
 
     async resolve(parent, args, context) {
       const { koaContext } = context;
 
       koaContext.request.body = toPlainObject(args);
 
-      await strapi.plugin('users-permissions').controller('auth').changePassword(koaContext);
+      await strapi
+        .plugin(pluginId)
+        .controller("auth")
+        .changePassword(koaContext);
 
       const output = koaContext.body;
 
