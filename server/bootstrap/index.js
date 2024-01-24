@@ -198,9 +198,7 @@ For security reasons, prefer storing the secret in an environment variable and r
     if (modifications.length) {
       // if there is a potential vulnerability, show a warning
       strapi.log.warn(
-        `${
-          pluginId.ca
-        } registration has defaulted to accepting the following additional user fields during registration: ${modifications.join(
+        `${pluginId} registration has defaulted to accepting the following additional user fields during registration: ${modifications.join(
           ","
         )}`
       );

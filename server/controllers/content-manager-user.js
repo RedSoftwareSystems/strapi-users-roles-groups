@@ -52,6 +52,8 @@ const findEntityAndCheckPermissions = async (ability, action, model, id) => {
 module.exports = {
   /**
    * Create a/an user record.
+   *
+   * @param {import("koa").Context} ctx
    * @return {Object}
    */
   async create(ctx) {

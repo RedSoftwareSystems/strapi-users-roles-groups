@@ -18,7 +18,7 @@
 
 /** @type {import("../types/entries")} */
 const pluginName = require("../pluginId");
-const { deburr, snakeCase, omit, pick } = require("lodash");
+const { deburr, snakeCase, omit, set } = require("lodash");
 const { NotFoundError } = require("@strapi/utils").errors;
 const { getService } = require("../utils");
 
@@ -86,13 +86,11 @@ module.exports = ({ strapi }) => ({
     // Group by `type`.
     const permissions = role.permissions.reduce((acc, permission) => {
       const [type, controller, action] = permission.action.split(".");
-      return {
-        ...acc,
-        [`${type}.controllers.${controller}.${action}`]: {
-          enabled: true,
-          policy: "",
-        },
-      };
+
+      return set(acc, `${type}.controllers.${controller}.${action}`, {
+        enabled: true,
+        policy: "",
+      });
     }, allActions);
 
     return {
@@ -128,6 +126,8 @@ module.exports = ({ strapi }) => ({
    * @returns {Promise<void>}
    */
   async updateRole(roleID, inputData) {
+    //todo fix-me
+
     /**
      * @type {RolePermissions} - Role and permission
      */
@@ -146,7 +146,7 @@ module.exports = ({ strapi }) => ({
     });
 
     /**
-     * @type {string[]}
+     * @type {Permission[]}
      */
     const newActions = Object.entries(inputData.permissions).flatMap(
       ([permissionName, permission]) =>
@@ -181,7 +181,7 @@ module.exports = ({ strapi }) => ({
     /**
      * @type {Permission[]}
      */
-    const actionsPremissionsToCreate = newActions
+    const actionsPermissionsToCreate = newActions
       .filter((action) => !oldActions.includes(action))
       .map((action) => ({ action, role: role.id }));
 
@@ -189,9 +189,17 @@ module.exports = ({ strapi }) => ({
       where: { id: { $in: permissionsToDelete.map((p) => p.id) } },
     });
 
-    await strapi
-      .query(`plugin::${pluginName}.permission`)
-      .createMany({ data: actionsPermissionsToCreate });
+    // await strapi
+    //   .query(`plugin::${pluginName}.permission`)
+    //   .createMany({ data: actionsPermissionsToCreate });
+
+    await Promise.all(
+      actionsPermissionsToCreate.map((permissionInfo) =>
+        strapi
+          .query(`plugin::${pluginName}.permission`)
+          .create({ data: permissionInfo })
+      )
+    );
   },
 
   /**

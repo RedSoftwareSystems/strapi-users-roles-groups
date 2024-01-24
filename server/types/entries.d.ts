@@ -31,11 +31,8 @@ type TApiOrPluginPermission = string;
 type TPermissionEntity = string;
 type TController = string;
 type TActionName = string;
-export type ActionsPermission = Record<
-  TActionName,
-  { enabled: boolean; policy: string }
->;
-export interface InputRole extends CoreEntity {
+
+export interface ActionsPermission extends CoreEntity {
   name?: string;
   description?: string;
   type?: string;
@@ -47,6 +44,8 @@ export interface InputRole extends CoreEntity {
   >;
   users?: User[];
 }
+
+export type InputRole = ActionsPermission;
 
 export interface User extends CoreEntity {
   username?: string;

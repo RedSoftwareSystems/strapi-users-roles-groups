@@ -23,6 +23,7 @@ module.exports = {
     action: {
       type: "string",
       required: true,
+      unique: true,
       configurable: false,
     },
     role: {

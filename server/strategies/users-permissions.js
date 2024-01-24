@@ -56,10 +56,13 @@ const authenticate = async (ctx) => {
         const permissions = await servicePermission.findRolePermissions(
           role.id
         );
-        permissions.forEach((p) => permissionsMap.set(p.id, p));
+
+        permissions.forEach((p) => {
+          permissionsMap.set(p.id, p);
+        });
       }
 
-      const permissions = permissionsMap.values.map(
+      const permissions = [...permissionsMap.values()].map(
         servicePermission.toContentAPIPermission
       );
 

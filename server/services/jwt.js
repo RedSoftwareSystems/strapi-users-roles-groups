@@ -46,10 +46,10 @@ module.exports = ({ strapi }) => ({
    */
   issue(payload, jwtOptions = {}) {
     return jwt.sign(
-      payload,
+      payload.toJSON?.() || payload,
       strapi.config.get(`plugin.${pluginId}.jwtSecret`),
       {
-        ...algorithm(strapi.config.get(`plugin.${pluginId}.jwt`)),
+        ...strapi.config.get(`plugin.${pluginId}.jwt`),
         ...jwtOptions,
       }
     );
@@ -71,6 +71,7 @@ module.exports = ({ strapi }) => ({
           if (err) {
             return reject(new Error("Invalid token."));
           }
+
           resolve(tokenPayload);
         }
       );

@@ -67,7 +67,7 @@ const userSchema = {
       type: "relation",
       relation: "manyToMany",
       target: `plugin::${pluginId}.role`,
-      inversedBy: "users",
+      mappedBy: "users",
       configurable: false,
     },
   },

@@ -1,15 +1,15 @@
 tags:
-  - name: 'Users-Permissions - Auth'
-    description: 'Authentication endpoints'
+  - name: "Users-Permissions-Ext - Auth"
+    description: "Authentication endpoints"
     externalDocs:
-      description: 'Find out more'
-      url: 'https://docs.strapi.io/developer-docs/latest/plugins/users-permissions.html'
+      description: "Find out more"
+      url: "https://docs.strapi.io/developer-docs/latest/plugins/users-permissions.html"
 
-  - name: 'Users-Permissions - Users & Roles'
-    description: 'Users, roles, and permissions endpoints'
+  - name: "Users-Permissions-Ext - Users & Roles"
+    description: "Users, roles, and permissions endpoints"
     externalDocs:
-      description: 'Find out more'
-      url: 'https://docs.strapi.io/developer-docs/latest/plugins/users-permissions.html'
+      description: "Find out more"
+      url: "https://docs.strapi.io/developer-docs/latest/plugins/users-permissions.html"
 
 paths:
   /connect/{provider}:
@@ -21,7 +21,7 @@ paths:
           description: Provider name
           schema:
             type: string
-            pattern: '.*'
+            pattern: ".*"
       tags:
         - Users-Permissions - Auth
       summary: Login with a provider
@@ -34,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /auth/local:
     post:
       tags:
@@ -61,13 +61,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-UserRegistration'
+                $ref: "#/components/schemas/Users-Permissions-UserRegistration"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /auth/local/register:
     post:
       tags:
@@ -97,13 +97,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-UserRegistration'
+                $ref: "#/components/schemas/Users-Permissions-UserRegistration"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /auth/{provider}/callback:
     get:
@@ -123,13 +123,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-UserRegistration'
+                $ref: "#/components/schemas/Users-Permissions-UserRegistration"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /auth/forgot-password:
     post:
@@ -163,7 +163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /auth/reset-password:
     post:
       tags:
@@ -192,13 +192,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-UserRegistration'
+                $ref: "#/components/schemas/Users-Permissions-UserRegistration"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /auth/change-password:
     post:
@@ -228,13 +228,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-UserRegistration'
+                $ref: "#/components/schemas/Users-Permissions-UserRegistration"
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /auth/email-confirmation:
     get:
       tags:
@@ -254,7 +254,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /auth/send-email-confirmation:
     post:
@@ -288,7 +288,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users-permissions/permissions:
     get:
@@ -304,7 +304,7 @@ paths:
                 type: object
                 properties:
                   permissions:
-                    $ref: '#/components/schemas/Users-Permissions-PermissionsTree'
+                    $ref: "#/components/schemas/Users-Permissions-PermissionsTree"
               example:
                 permissions:
                   api::content-type.content-type:
@@ -312,29 +312,29 @@ paths:
                       controllerA:
                         find:
                           enabled: false
-                          policy: ''
+                          policy: ""
                         findOne:
                           enabled: false
-                          policy: ''
+                          policy: ""
                         create:
                           enabled: false
-                          policy: ''
+                          policy: ""
                       controllerB:
                         find:
                           enabled: false
-                          policy: ''
+                          policy: ""
                         findOne:
                           enabled: false
-                          policy: ''
+                          policy: ""
                         create:
                           enabled: false
-                          policy: ''
+                          policy: ""
         default:
           description: Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users-permissions/roles:
     get:
       tags:
@@ -352,7 +352,7 @@ paths:
                     type: array
                     items:
                       allOf:
-                        - $ref: '#/components/schemas/Users-Permissions-Role'
+                        - $ref: "#/components/schemas/Users-Permissions-Role"
                         - type: object
                           properties:
                             nb_users:
@@ -372,14 +372,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
     post:
       tags:
         - Users-Permissions - Users & Roles
       summary: Create a role
       requestBody:
-        $ref: '#/components/requestBodies/Users-Permissions-RoleRequest'
+        $ref: "#/components/requestBodies/Users-Permissions-RoleRequest"
       responses:
         200:
           description: Returns ok if the role was create
@@ -396,7 +396,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users-permissions/roles/{id}:
     get:
@@ -419,7 +419,7 @@ paths:
                 type: object
                 properties:
                   role:
-                    $ref: '#/components/schemas/Users-Permissions-Role'
+                    $ref: "#/components/schemas/Users-Permissions-Role"
               example:
                 role:
                   id: 1
@@ -439,7 +439,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users-permissions/roles/{role}:
     put:
@@ -454,7 +454,7 @@ paths:
             type: string
           description: role Id
       requestBody:
-        $ref: '#/components/requestBodies/Users-Permissions-RoleRequest'
+        $ref: "#/components/requestBodies/Users-Permissions-RoleRequest"
       responses:
         200:
           description: Returns ok if the role was udpated
@@ -471,7 +471,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
     delete:
       tags:
@@ -500,7 +500,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users:
     get:
@@ -515,7 +515,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Users-Permissions-User'
+                  $ref: "#/components/schemas/Users-Permissions-User"
               example:
                 - id: 9
                   username: foao@strapi.io
@@ -530,7 +530,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
     post:
       tags:
@@ -564,11 +564,11 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Users-Permissions-User'
+                  - $ref: "#/components/schemas/Users-Permissions-User"
                   - type: object
                     properties:
                       role:
-                        $ref: '#/components/schemas/Users-Permissions-Role'
+                        $ref: "#/components/schemas/Users-Permissions-Role"
               example:
                 id: 1
                 username: foo
@@ -590,7 +590,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users/{id}:
     get:
       tags:
@@ -609,7 +609,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-User'
+                $ref: "#/components/schemas/Users-Permissions-User"
               example:
                 id: 1
                 username: foo
@@ -624,7 +624,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     put:
       tags:
         - Users-Permissions - Users & Roles
@@ -664,11 +664,11 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Users-Permissions-User'
+                  - $ref: "#/components/schemas/Users-Permissions-User"
                   - type: object
                     properties:
                       role:
-                        $ref: '#/components/schemas/Users-Permissions-Role'
+                        $ref: "#/components/schemas/Users-Permissions-Role"
               example:
                 id: 1
                 username: foo
@@ -690,7 +690,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     delete:
       tags:
         - Users-Permissions - Users & Roles
@@ -703,13 +703,13 @@ paths:
             type: string
           description: user Id
       responses:
-        '200':
+        "200":
           description: Returns deleted user info
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/Users-Permissions-User'
+                  - $ref: "#/components/schemas/Users-Permissions-User"
               example:
                 id: 1
                 username: foo
@@ -724,7 +724,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users/me:
     get:
       tags:
@@ -736,7 +736,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users-Permissions-User'
+                $ref: "#/components/schemas/Users-Permissions-User"
               example:
                 id: 1
                 username: foo
@@ -751,7 +751,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /users/count:
     get:
@@ -771,7 +771,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
@@ -801,13 +801,13 @@ components:
           example: 1
         username:
           type: string
-          example: 'foo.bar'
+          example: "foo.bar"
         email:
           type: string
-          example: 'foo.bar@strapi.io'
+          example: "foo.bar@strapi.io"
         provider:
           type: string
-          example: 'local'
+          example: "local"
         confirmed:
           type: boolean
           example: true
@@ -817,20 +817,20 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2022-06-02T08:32:06.258Z'
+          example: "2022-06-02T08:32:06.258Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2022-06-02T08:32:06.267Z'
+          example: "2022-06-02T08:32:06.267Z"
 
     Users-Permissions-UserRegistration:
       type: object
       properties:
         jwt:
           type: string
-          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         user:
-          $ref: '#/components/schemas/Users-Permissions-User'
+          $ref: "#/components/schemas/Users-Permissions-User"
 
     Users-Permissions-PermissionsTree:
       type: object
@@ -866,7 +866,7 @@ components:
               type:
                 type: string
               permissions:
-                $ref: '#/components/schemas/Users-Permissions-PermissionsTree'
+                $ref: "#/components/schemas/Users-Permissions-PermissionsTree"
           example:
             name: foo
             description: role foo

@@ -10,6 +10,7 @@ module.exports = {
     singularName: "role",
     pluralName: "roles",
     displayName: "Role",
+    mainField: "name",
   },
   pluginOptions: {
     "content-manager": {
@@ -46,7 +47,7 @@ module.exports = {
       type: "relation",
       relation: "manyToMany",
       target: `plugin::${pluginId}.user`,
-      mappedBy: "roles",
+      inversedBy: "roles",
       configurable: false,
     },
   },

@@ -11,8 +11,8 @@ import {
   Main,
   Option,
   Select,
-  MultiSelect,
-  MultiSelectOption,
+  SingleSelect,
+  SingleSelectOption,
   Typography,
   useNotifyAT,
 } from "@strapi/design-system";
@@ -213,7 +213,7 @@ const AdvancedSettingsPage = () => {
                     </Typography>
                     <Grid gap={6}>
                       <GridItem col={6} s={12}>
-                        <Select
+                        <SingleSelect
                           label={formatMessage({
                             id: getTrad("EditForm.inputSelect.label.role"),
                             defaultMessage:
@@ -235,12 +235,15 @@ const AdvancedSettingsPage = () => {
                         >
                           {data.roles.map((role) => {
                             return (
-                              <Option key={role.type} value={role.type}>
+                              <SingleSelectOption
+                                key={role.type}
+                                value={role.type}
+                              >
                                 {role.name}
-                              </Option>
+                              </SingleSelectOption>
                             );
                           })}
-                        </Select>
+                        </SingleSelect>
                       </GridItem>
                       {layout.map((input) => {
                         let value = values[input.name];

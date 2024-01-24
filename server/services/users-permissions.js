@@ -8,6 +8,7 @@ require("core-js/actual/set");
 const pluginName = require("../pluginId");
 
 const _template = require("lodash").template;
+const _ = require("lodash");
 
 const urlJoin = require("url-join");
 
@@ -89,6 +90,19 @@ const DEFAULT_PERMISSIONS = [
   },
 ];
 
+const transformRoutePrefixFor = (pluginName) => (route) => {
+  const prefix = route.config && route.config.prefix;
+  const path =
+    prefix !== undefined
+      ? `${prefix}${route.path}`
+      : `/${pluginName}${route.path}`;
+
+  return {
+    ...route,
+    path,
+  };
+};
+
 /**
  * Fixes the route path with the
  *  provided route.config.prefix or rhw plugin name if the first parameter is undefined
@@ -116,73 +130,6 @@ const transformRoutePrefix = (route) => {
  */
 module.exports = ({ strapi }) => ({
   /**
-   * Returns the content/type controllers policy for api and plugins
-   *
-   * @param {boolean} defaultEnable
-   * @returns {Record<string, Record<string, ControllerPolicy>>}
-   */
-  getActions({ defaultEnable = false } = {}) {
-    /**
-     * Checks if it is a content-api controller
-     *
-     * @param {Common.Controller} action
-     * @returns {boolean}
-     */
-    const isContentApi = (action) =>
-      !!action[Symbol.for("__type__")]?.includes("content-api");
-
-    /**
-     * @type {Record<string, Record<string, ControllerPolicy>>}
-     */
-    const apiActions = Object.entries(strapi.api).reduce(
-      (acc, [apiName, module]) => ({
-        ...acc,
-        [`api::${apiName}`]: {
-          controllers: Object.entries(module.controllers)
-            .filter(([_controllerName, controller]) => isContentApi(controller))
-            .reduce(
-              (contAcc, [controllerName, _controller]) => ({
-                ...contAcc,
-                [controllerName]: {
-                  enabled: defaultEnable,
-                  policy: "",
-                },
-              }),
-              {}
-            ),
-        },
-      }),
-      {}
-    );
-
-    /**
-     * @type {Record<string, Record<string, ControllerPolicy>>}
-     */
-    const pluginActions = Object.entries(strapi.plugins).reduce(
-      (acc, [pluginName, plugin]) => ({
-        ...acc,
-        [`plugin::${pluginName}`]: {
-          controllers: Object.entries(plugin.controllers)
-            .filter(([_controllerName, controller]) => isContentApi(controller))
-            .reduce(
-              (contAcc, [controllerName, _controller]) => ({
-                ...contAcc,
-                [controllerName]: {
-                  enabled: defaultEnable,
-                  policy: "",
-                },
-              }),
-              {}
-            ),
-        },
-      }),
-      {}
-    );
-
-    return { ...apiActions, ...pluginActions };
-  },
-
-  /**
    * Strapi APIs and plugins routes
    *
    * @returns {Promise<Record<string, Common.Route>>}
@@ -196,43 +143,163 @@ module.exports = ({ strapi }) => ({
     const apiRoutes = Object.entries(strapi.api).reduce(
       (acc, [apiName, module]) => ({
         ...acc,
-        [`api::${apiName}`]: module.routes
+        [`api::${apiName}`]: Object.values(module.routes)
           .flatMap((route) => route.routes || route)
           .filter((route) => route?.info?.type === "content-api")
-          .map(
-            route({
-              ...route,
-              path: urlJoin(apiPrefix, route.path),
-            })
-          ),
+          .map((route) => ({
+            ...route,
+            path: urlJoin(apiPrefix, route.path),
+          })),
       }),
       {}
     );
-
     /**
      * @type {Record<string, Common.Route[]>}
      */
     const pluginsRoutes = Object.entries(strapi.plugins).reduce(
-      (acc, [pluginName, module]) => ({
-        ...acc,
-        [`plugin::${pluginName}`]: module.routes
-          .flatMap(
-            (route) =>
-              route?.routes.map(transformRoutePrefix) ||
-              transformRoutePrefix(route)
-          )
-          .filter((route) => route?.info?.type === "content-api")
-          .map(
-            route({
+      (acc, [pluginName, module]) => {
+        return {
+          ...acc,
+          [`plugin::${pluginName}`]: Object.values(module.routes)
+            .flatMap((route) => {
+              return (
+                route.routes?.map(transformRoutePrefix) ||
+                transformRoutePrefix(route)
+              );
+            })
+            .filter((route) => route?.info?.type === "content-api")
+            .map((route) => ({
               ...route,
               path: urlJoin(apiPrefix, route.path),
-            })
-          ),
-      }),
+            })),
+        };
+      },
       {}
     );
 
     return { ...apiRoutes, ...pluginsRoutes };
+  },
+
+  /**
+   * Returns the content/type controllers policy for api and plugins
+   *
+   * @param {boolean} defaultEnable
+   * @returns {Record<string, Record<string, ControllerPolicy>>}
+   */
+  getActions({ defaultEnable = false } = {}) {
+    const actionMap = {};
+
+    const isContentApi = (action) => {
+      if (!_.has(action, Symbol.for("__type__"))) {
+        return false;
+      }
+
+      return action[Symbol.for("__type__")].includes("content-api");
+    };
+
+    _.forEach(strapi.api, (api, apiName) => {
+      const controllers = _.reduce(
+        api.controllers,
+        (acc, controller, controllerName) => {
+          const contentApiActions = _.pickBy(controller, isContentApi);
+
+          if (_.isEmpty(contentApiActions)) {
+            return acc;
+          }
+
+          acc[controllerName] = _.mapValues(contentApiActions, () => {
+            return {
+              enabled: defaultEnable,
+              policy: "",
+            };
+          });
+
+          return acc;
+        },
+        {}
+      );
+
+      if (!_.isEmpty(controllers)) {
+        actionMap[`api::${apiName}`] = { controllers };
+      }
+    });
+
+    _.forEach(strapi.plugins, (plugin, pluginName) => {
+      const controllers = _.reduce(
+        plugin.controllers,
+        (acc, controller, controllerName) => {
+          const contentApiActions = _.pickBy(controller, isContentApi);
+
+          if (_.isEmpty(contentApiActions)) {
+            return acc;
+          }
+
+          acc[controllerName] = _.mapValues(contentApiActions, () => {
+            return {
+              enabled: defaultEnable,
+              policy: "",
+            };
+          });
+
+          return acc;
+        },
+        {}
+      );
+
+      if (!_.isEmpty(controllers)) {
+        actionMap[`plugin::${pluginName}`] = { controllers };
+      }
+    });
+
+    return actionMap;
+  },
+
+  async getRoutesOld() {
+    const routesMap = {};
+
+    _.forEach(strapi.api, (api, apiName) => {
+      const routes = _.flatMap(api.routes, (route) => {
+        if (_.has(route, "routes")) {
+          return route.routes;
+        }
+
+        return route;
+      }).filter((route) => route.info.type === "content-api");
+
+      if (routes.length === 0) {
+        return;
+      }
+
+      const apiPrefix = strapi.config.get("api.rest.prefix");
+      routesMap[`api::${apiName}`] = routes.map((route) => ({
+        ...route,
+        path: urlJoin(apiPrefix, route.path),
+      }));
+    });
+
+    _.forEach(strapi.plugins, (plugin, pluginName) => {
+      const transformPrefix = transformRoutePrefixFor(pluginName);
+
+      const routes = _.flatMap(plugin.routes, (route) => {
+        if (_.has(route, "routes")) {
+          return route.routes.map(transformPrefix);
+        }
+
+        return transformPrefix(route);
+      }).filter((route) => route.info.type === "content-api");
+
+      if (routes.length === 0) {
+        return;
+      }
+
+      const apiPrefix = strapi.config.get("api.rest.prefix");
+      routesMap[`plugin::${pluginName}`] = routes.map((route) => ({
+        ...route,
+        path: urlJoin(apiPrefix, route.path),
+      }));
+    });
+
+    return routesMap;
   },
 
   /**
@@ -256,7 +323,6 @@ module.exports = ({ strapi }) => ({
         )
       )
     );
-
     const pluginsActions = Object.entries(strapi.plugins).flatMap(
       ([pluginName, plugin]) =>
         Object.entries(plugin.controllers).flatMap(
@@ -278,7 +344,7 @@ module.exports = ({ strapi }) => ({
       .query(`plugin::${pluginId}.permission`)
       .deleteMany({ where: { action: { $in: toDelete } } });
 
-    if (!permissionsFoundInDB.length) {
+    if (!permissionsFoundInDB.size) {
       // create default permissions
       for (const role of roles) {
         const permissionsToCreate = DEFAULT_PERMISSIONS.filter(
@@ -287,6 +353,7 @@ module.exports = ({ strapi }) => ({
           action,
           role: role.id,
         }));
+
         await Promise.all(
           permissionsToCreate.map((data) => {
             return strapi.query(`plugin::${pluginId}.permission`).create({
